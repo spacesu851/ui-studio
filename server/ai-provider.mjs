@@ -35,7 +35,7 @@ async function readLimited(response,limit=32*1024*1024){
 export class OpenAiProvider {
   constructor(config,{fetcher=fetch}={}){this.config=config;this.fetcher=fetcher;}
   async request(route,{body,signal,method='POST'}={}){
-    const timeout=AbortSignal.timeout(12*60*1000),combined=signal?AbortSignal.any([signal,timeout]):timeout;
+    const timeout=AbortSignal.timeout(route.startsWith('/models/')?20000:route==='/images/edits'?12*60*1000:2*60*1000),combined=signal?AbortSignal.any([signal,timeout]):timeout;
     let response;try{response=await this.fetcher(this.config.baseUrl+route,{method,headers:{Authorization:`Bearer ${this.config.apiKey}`,...(body instanceof FormData?{}:body?{'Content-Type':'application/json'}:{})},body:body instanceof FormData?body:body?JSON.stringify(body):undefined,signal:combined,redirect:'error'});}catch(e){if(signal?.aborted)throw signal.reason;throw fail(timeout.aborted?'模型请求超时。已保留进度，可稍后续做。':'无法连接模型服务，请检查接口地址和网络。',502);}
     const raw=await readLimited(response);let data;try{data=JSON.parse(raw)}catch{throw fail('模型服务未返回 JSON，请核对接口地址。',502)}
     if(!response.ok){const hints={401:'API Key 无效或已失效',403:'当前账号没有模型权限，图像模型可能需要组织验证',404:'模型或接口不存在，请检查模型名称和 API 地址',429:'模型额度或速率受限，请稍后续做'};throw fail(`${hints[response.status]||'模型服务请求失败'}（HTTP ${response.status}）`,502);}
