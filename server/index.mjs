@@ -7,17 +7,28 @@ import {Store} from './store.mjs';
 import {detect,extract,validateElements} from './image.mjs';
 import {LocalExports} from './local-exports.mjs';
 import {inspectMaterials} from './materials.mjs';
+import {AiSettings,OpenAiProvider} from './ai-provider.mjs';
+import {AiJobs} from './ai-jobs.mjs';
 const here=path.dirname(fileURLToPath(import.meta.url)),root=path.dirname(here);
-export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(root,'data'),exportRoot=process.env.UI_STUDIO_EXPORT_ROOT||path.join(root,'../ui-studio-exports'),openDirectory,production=false}={}){
+export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(root,'data'),exportRoot=process.env.UI_STUDIO_EXPORT_ROOT||path.join(root,'../ui-studio-exports'),openDirectory,production=false,aiEnvironment=process.env,aiProviderFactory=config=>new OpenAiProvider(config)}={}){
   const store=await new Store(dataDir).init(),app=express();
   const local=new LocalExports(store,exportRoot,openDirectory);
+  const aiSettings=new AiSettings(store.db,aiEnvironment),aiJobs=new AiJobs(store,aiSettings,local,{providerFactory:aiProviderFactory});
   async function finishVersion(m){if(m.elements.length&&m.processing?.saveLocal)await local.create(m,{open:m.processing.openLocal});return m;}
   app.disable('x-powered-by');
   app.use((req,res,next)=>{const host=req.hostname;if(!['127.0.0.1','localhost','[::1]','::1'].includes(host))return res.status(403).json({error:'仅允许本机访问'});
     if(req.headers.origin&&req.headers.origin!==`http://${req.headers.host}`)return res.status(403).json({error:'请求来源不匹配'});
     res.setHeader('X-Content-Type-Options','nosniff');next();});
   app.use('/api',express.json({limit:'32mb'}));
-  app.get('/api/health',(req,res)=>res.json({ok:true,engine:'本地去背景 + 透明通道验证 + Codex补绘回传',storage:'local',bridgeVersion:'2'}));
+  app.get('/api/health',(req,res)=>res.json({ok:true,engine:'独立 AI 识别 + 透明提取 + 补绘 + 视觉质检',storage:'local',bridgeVersion:'3',aiConfigured:aiSettings.public().configured}));
+  app.get('/api/ai/settings',(req,res)=>res.json(aiSettings.public()));
+  app.post('/api/ai/settings',(req,res)=>res.json(aiSettings.update(req.body)));
+  app.post('/api/ai/test',async(req,res)=>res.json(await aiProviderFactory(aiSettings.snapshot()).test()));
+  app.get('/api/ui/:id/ai',(req,res)=>res.json(aiJobs.latest(req.params.id)));
+  app.post('/api/ui/:id/ai',async(req,res)=>res.status(202).json(aiJobs.start(req.params.id,req.body)));
+  app.get('/api/ai/jobs/:job',(req,res)=>res.json(aiJobs.get(req.params.job)));
+  app.post('/api/ai/jobs/:job/cancel',(req,res)=>res.json(aiJobs.cancel(req.params.job)));
+  app.post('/api/ai/jobs/:job/resume',(req,res)=>res.status(202).json(aiJobs.resume(req.params.job)));
   app.get('/api/connection',(req,res)=>res.json({projectPath:root,cliPath:path.join(root,'bridge','cli.mjs'),mcpPath:path.join(root,'bridge','mcp.mjs'),nodePath:process.execPath,exportRoot:local.root}));
   app.get('/api/folders',(req,res)=>res.json(store.folders()));
   app.post('/api/folders',(req,res)=>res.status(201).json(store.createFolder(req.body.title)));
@@ -43,7 +54,7 @@ export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(r
   app.get('/ui/:id',(req,res,next)=>{if(!/^UI-[a-f0-9]{8}$/.test(req.params.id))return next();res.setHeader('Link',`</api/ui/${req.params.id}>; rel="describedby"; type="application/json"`);if(req.headers.accept?.includes('application/json'))return res.json(store.version(req.params.id,req.query.version));next();});
   if(production){app.use(express.static(path.join(root,'dist')));app.get('/{*splat}',(req,res)=>res.sendFile(path.join(root,'dist','index.html')));}
   else{const {createServer}=await import('vite');const vite=await createServer({root,server:{middlewareMode:true,hmr:false},appType:'spa'});app.use(vite.middlewares);app.locals.vite=vite;}
-  app.use((e,req,res,next)=>{console.error(e.message);res.status(e.status||400).json({error:e.type==='entity.too.large'?'文件过大，最多 20 MB':e.message||'操作失败'});});app.locals.store=store;app.locals.localExports=local;return app;
+  app.use((e,req,res,next)=>{console.error(e.message);res.status(e.status||400).json({error:e.type==='entity.too.large'?'文件过大，最多 20 MB':e.message||'操作失败'});});app.locals.store=store;app.locals.localExports=local;app.locals.aiJobs=aiJobs;app.locals.aiSettings=aiSettings;return app;
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   const port=Number(process.env.PORT)||4763;const app=await createApp({production:process.argv.includes('--production')});
