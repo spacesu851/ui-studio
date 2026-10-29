@@ -37,6 +37,7 @@ export class AiJobs {
   save(job){job.updated=new Date().toISOString();this.store.db.prepare('INSERT INTO ai_jobs VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET json=excluded.json').run(job.id,job.uiId,job.created,JSON.stringify(job));return job;}
   get(id){const row=this.store.db.prepare('SELECT json FROM ai_jobs WHERE id=?').get(id);if(!row)throw problem('找不到 AI 任务',404);return JSON.parse(row.json);}
   latest(uiId){this.store.ui(uiId);const row=this.store.db.prepare('SELECT json FROM ai_jobs WHERE ui_id=? ORDER BY created DESC,rowid DESC LIMIT 1').get(uiId);return row?JSON.parse(row.json):null;}
+  async asset(id,index){const job=this.get(id);if(!/^\d{1,2}$/.test(String(index)))throw problem('素材不存在',404);const asset=job.assets[Number(index)];if(!asset||asset.status!=='completed'||asset.file!==`${String(asset.index).padStart(2,'0')}.png`)throw problem('素材尚未通过检查',404);return readFile(path.join(this.root,job.id,asset.file));}
   available(){if(this.running.size)throw problem('已有 AI 任务运行中，请等待或取消后再开始。',409);}
   start(uiId,input){this.available();const config=this.settings.snapshot(),manifest=this.store.version(uiId);if(input.expectedVersion!==manifest.version)throw problem('版本已变化，请先同步。',409);
     const job={id:'AI-'+randomBytes(8).toString('hex'),uiId,baseVersion:manifest.version,created:new Date().toISOString(),status:'queued',message:'等待识别完整组件',requirements:{...this.store.preferences(uiId),removeBackground:true,transparentComponents:true},config:{...config,apiKey:undefined},assets:[],summary:'',completed:0};this.save(job);this.launch(job,config);return job;
@@ -52,9 +53,11 @@ export class AiJobs {
     for(const asset of job.assets){signal.throwIfAborted();if(asset.status==='completed')continue;const crop=await sharp(original).extract({left:asset.rect.x,top:asset.rect.y,width:asset.rect.width,height:asset.rect.height}).png().toBuffer();let lastError='';
       // Each resume allows at most two new generation attempts for the failed asset.
       for(let attempt=0;attempt<2;attempt++){
-        update('generating',`正在${asset.role==='background'?'补绘背景':'提取透明组件'}：${asset.name}`);asset.status='generating';asset.attempts++;asset.prompt=editPrompt(asset,job.requirements,lastError||asset.issue);this.save(job);
-        try{const generated=await provider.edit({original,crop,asset,prompt:asset.prompt,signal});signal.throwIfAborted();const {output,alpha}=await validateOutput(generated,asset);update('reviewing',`正在检查透明通道、完整性与相似度：${asset.name}`);
-          const review=await provider.review({crop,output,asset,signal});if(review?.passed!==true||typeof review.similarity!=='number'||!Number.isFinite(review.similarity)||review.similarity<0.75||review.similarity>1||!Array.isArray(review.issues)||review.issues.length)throw problem(`视觉质检未通过：${(review?.issues||[]).join('；')||'相似度不足'}`);
+        update('generating',`正在${asset.role==='background'?'补绘背景':'提取透明组件'}：${asset.name}`);asset.status='generating';if(!asset.candidateFile){asset.attempts++;asset.prompt=editPrompt(asset,job.requirements,lastError||asset.issue);}this.save(job);
+        try{const candidate=`${String(asset.index).padStart(2,'0')}-candidate.png`;let generated;
+          if(asset.candidateFile===candidate)generated=await readFile(path.join(folder,candidate));else{generated=await provider.edit({original,crop,asset,prompt:asset.prompt,signal});signal.throwIfAborted();const validated=await validateOutput(generated,asset);generated=validated.output;await writeFile(path.join(folder,candidate),generated);asset.candidateFile=candidate;this.save(job);}
+          const {output,alpha}=await validateOutput(generated,asset);update('reviewing',`正在检查透明通道、完整性与相似度：${asset.name}`);
+          const review=await provider.review({crop,output,asset,signal});if(review?.passed!==true||typeof review.similarity!=='number'||!Number.isFinite(review.similarity)||review.similarity<0.75||review.similarity>1||!Array.isArray(review.issues)||review.issues.length){asset.candidateFile=undefined;throw problem(`视觉质检未通过：${(review?.issues||[]).join('；')||'相似度不足'}`);}
           const file=`${String(asset.index).padStart(2,'0')}.png`;await writeFile(path.join(folder,file),output);asset.file=file;asset.alpha=alpha;asset.review=review;asset.issue=undefined;asset.status='completed';job.completed=job.assets.filter(a=>a.status==='completed').length;this.save(job);lastError='';break;
         }catch(e){signal.throwIfAborted();lastError=safeError(e,config.apiKey);asset.issue=lastError;asset.status='failed';this.save(job);if(e.status===502)throw e;}
       }
