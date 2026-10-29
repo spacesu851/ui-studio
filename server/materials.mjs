@@ -1,0 +1,6 @@
+import sharp from 'sharp';
+import {readFile} from 'node:fs/promises';
+import {materialRole,materialMethod} from '../shared/processing.mjs';
+export async function alphaInfo(png){const {data,info}=await sharp(png).ensureAlpha().raw().toBuffer({resolveWithObject:true});let clear=0,partial=0,solid=0;for(let i=3;i<data.length;i+=4){if(data[i]===0)clear++;else if(data[i]===255)solid++;else partial++;}return {width:info.width,height:info.height,transparentPixels:clear,partialPixels:partial,opaquePixels:solid,hasTransparency:clear+partial>0,hasVisiblePixels:solid+partial>0};}
+export function materialDetails(e,old){return {role:materialRole(e.name,e.role??old?.role),method:materialMethod(e.method??old?.method),notes:String(e.notes??old?.notes??'').slice(0,3000),generatedBy:String(e.generatedBy??old?.generatedBy??'').slice(0,100),prompt:String(e.prompt??old?.prompt??'').slice(0,16000)};}
+export async function inspectMaterials(manifest,resolveFile){const elements=[];for(const e of manifest.elements){const details=materialDetails(e);const alpha=e.alpha||await alphaInfo(await readFile(resolveFile(e.url)));elements.push({id:e.id,name:e.name,...details,alpha,requiresTransparency:details.role==='component',warning:details.role==='component'&&!alpha.hasTransparency?'此组件没有透明像素，需要去背景或重新标记类型':null});}return elements;}

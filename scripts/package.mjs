@@ -1,0 +1,11 @@
+import {createWriteStream} from 'node:fs';
+import {access} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import path from 'node:path';
+import archiver from 'archiver';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),output=path.resolve(root,'../ui-studio.zip');
+await access(path.join(root,'dist/index.html'));
+const stream=createWriteStream(output),zip=archiver('zip',{zlib:{level:7}});const done=new Promise((resolve,reject)=>{stream.on('close',resolve);stream.on('error',reject);zip.on('error',reject)});zip.pipe(stream);
+for(const folder of ['src','server','bridge','shared','scripts','public','tests','dist','licenses'])zip.directory(path.join(root,folder),`ui-studio/${folder}`,entry=>entry.name.toLowerCase().endsWith('.ps1')?false:entry);
+for(const file of ['package.json','package-lock.json','vite.config.mjs','index.html','README.md','REFERENCE.md','AGENTS.md','.gitignore'])zip.file(path.join(root,file),{name:`ui-studio/${file}`});
+await zip.finalize();await done;console.log(`Saved ${output} (${zip.pointer()} bytes); no PowerShell launcher included.`);

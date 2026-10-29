@@ -1,0 +1,32 @@
+import {mkdir,readFile,writeFile,rename,stat,realpath} from 'node:fs/promises';
+import {spawn} from 'node:child_process';
+import {randomBytes} from 'node:crypto';
+import path from 'node:path';
+import sharp from 'sharp';
+import {inspectMaterials} from './materials.mjs';
+const xml=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+const safe=s=>String(s).replace(/[\x00-\x1f<>:"/\\|?*]/g,'_').replace(/[ .]+$/g,'').slice(0,80)||'素材';
+export async function openDirectory(directory){const command=process.platform==='win32'?'explorer.exe':process.platform==='darwin'?'open':'xdg-open';await new Promise((resolve,reject)=>{const child=spawn(command,[directory],{shell:false,detached:true,stdio:'ignore'});child.once('spawn',()=>{child.unref();resolve()});child.once('error',reject)});}
+export class LocalExports {
+  constructor(store,root,opener=openDirectory){this.store=store;this.root=path.resolve(root);this.opener=opener;store.db.exec('CREATE TABLE IF NOT EXISTS local_exports(id TEXT PRIMARY KEY,ui_id TEXT NOT NULL,version INTEGER NOT NULL,created TEXT NOT NULL,json TEXT NOT NULL)');}
+  latest(id,version){const row=this.store.db.prepare('SELECT json FROM local_exports WHERE ui_id=? AND version=? ORDER BY created DESC,rowid DESC LIMIT 1').get(id,Number(version));return row?JSON.parse(row.json):null;}
+  record(item){this.store.db.prepare('INSERT INTO local_exports VALUES(?,?,?,?,?)').run(item.id,item.uiId,item.version,item.created,JSON.stringify(item));return item;}
+  async create(manifest,{open=false}={}){const item={id:randomBytes(12).toString('hex'),uiId:manifest.id,version:manifest.version,created:new Date().toISOString(),status:'saving',opened:false};let partial;
+    try{const stamp=item.created.replace(/[^\d]/g,'').slice(0,17),parent=path.join(this.root,manifest.id);await mkdir(parent,{recursive:true});const folder=path.join(parent,`v${manifest.version}-${stamp}-${item.id.slice(0,6)}`);partial=folder+'.partial';await mkdir(partial,{recursive:false});await mkdir(path.join(partial,'assets'));
+      const inspection=await inspectMaterials(manifest,url=>this.store.file(url)),exported=[];
+      await writeFile(path.join(partial,'original.png'),await readFile(this.store.file(manifest.original)));
+      for(const [i,e] of manifest.elements.entries()){const filename=`assets/${String(i+1).padStart(2,'0')}_${safe(e.name)}__${e.id}.png`;await writeFile(path.join(partial,filename),await readFile(this.store.file(e.url)));exported.push({...e,...inspection[i],file:filename});}
+      const localManifest={...manifest,originalFile:'original.png',elements:exported};await writeFile(path.join(partial,'manifest.json'),JSON.stringify(localManifest,null,2));await writeFile(path.join(partial,'catalog.json'),JSON.stringify({ui:manifest.id,version:manifest.version,processing:manifest.processing||this.store.preferences(manifest.id),processingReport:manifest.processingReport||{inpainting:'unverified',notes:'旧版本没有单独登记补绘状态'},assets:exported},null,2));
+      await writeFile(path.join(partial,'README.md'),`# ${manifest.title}\n\nUI ID: ${manifest.id}\n版本: v${manifest.version}\n独立素材: ${exported.length}\n\nassets/ 保存独立 PNG，original.png 为原图；manifest.json 包含原图坐标和本地文件名，catalog.json 包含真实 Alpha 检查和处理方式，preview.png 为棋盘底预览。\n\n背景允许不透明；组件应有实际透明像素。AI 补绘应单独标记，不能当成源 PSD 原始图层。unknown 或 unverified 表示未提供处理证明，不表示完成了 AI 补绘。\n\n${manifest.note}\n`);
+      await this.preview(exported,partial);await rename(partial,folder);item.directory=folder;item.assetDirectory=path.join(folder,'assets');item.assetCount=exported.length;item.status='saved';
+      if(open){try{await this.openPath(folder);item.opened=true}catch(e){item.openError=e.message}}
+    }catch(e){item.status='failed';item.error=e.message;if(partial)item.partialDirectory=partial;}return this.record(item);
+  }
+  async preview(elements,folder){const cols=Math.min(4,Math.max(1,elements.length)),rows=Math.max(1,Math.ceil(elements.length/cols)),cw=260,ch=210,w=cols*cw,h=rows*ch;
+    const canvas=Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><defs><pattern id="p" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#263144"/><path d="M0 0h8v8H0zM8 8h8v8H8z" fill="#344054"/></pattern></defs><rect width="100%" height="100%" fill="#111722"/>${elements.map((_,i)=>`<rect x="${i%cols*cw+8}" y="${Math.floor(i/cols)*ch+8}" width="244" height="156" rx="7" fill="url(#p)"/>`).join('')}</svg>`),layers=[];
+    for(const [i,e] of elements.entries()){const input=await sharp(path.join(folder,e.file)).resize(224,140,{fit:'inside'}).png().toBuffer(),m=await sharp(input).metadata();layers.push({input,left:Math.round(i%cols*cw+(cw-m.width)/2),top:Math.round(Math.floor(i/cols)*ch+16+(140-m.height)/2)});}
+    const labels=Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">${elements.map((e,i)=>`<text x="${i%cols*cw+12}" y="${Math.floor(i/cols)*ch+183}" fill="#d2deec" font-size="11" font-family="Microsoft YaHei, sans-serif">${xml(e.name.slice(0,28))}</text><text x="${i%cols*cw+12}" y="${Math.floor(i/cols)*ch+201}" fill="#91a6be" font-size="10">${e.alpha.hasTransparency?'RGBA verified':e.role==='background'?'background':'OPAQUE'} · ${xml(e.method)}</text>`).join('')}</svg>`);layers.push({input:labels,left:0,top:0});await sharp(canvas).composite(layers).png().toFile(path.join(folder,'preview.png'));
+  }
+  async openPath(directory){const target=await realpath(directory),root=await realpath(this.root);const rel=path.relative(root,target);if(rel.startsWith('..')||path.isAbsolute(rel)||!rel)throw new Error('只能打开本工具生成的素材文件夹');if(!(await stat(target)).isDirectory())throw new Error('素材文件夹不存在');await this.opener(target);}
+  async open(id,version,exportId){const row=exportId?this.store.db.prepare('SELECT json FROM local_exports WHERE id=? AND ui_id=? AND version=?').get(exportId,id,Number(version)):null;const item=exportId?(row?JSON.parse(row.json):null):this.latest(id,version);if(!item||item.status!=='saved')throw Object.assign(new Error('当前版本尚未保存到本地，请先保存'),{status:404});await this.openPath(item.directory);const {openError,...saved}=item;const result={...saved,opened:true};this.store.db.prepare('UPDATE local_exports SET json=? WHERE id=?').run(JSON.stringify(result),item.id);return result;}
+}
