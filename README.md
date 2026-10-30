@@ -2,7 +2,7 @@
 
 按用户提供的抖音视频界面和操作流程制作的本地 UI 拆图与素材版本工具。默认地址：**http://127.0.0.1:4763**。
 
-**独立 AI 版本下载：[v0.3.0-beta.1 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.1)。旧 v0.2.0 只有管理与桥接功能，不包含独立 AI 引擎。**
+**独立 AI 版本下载：[v0.3.0-beta.2 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.2)。旧 v0.2.0 只有管理与桥接功能，不包含独立 AI 引擎。**
 
 版本号与具体更新：[拾羽集更新日志](https://www.opsu.cc/updates/)。更新页源码与数据在 `site/updates/`。
 
@@ -27,6 +27,20 @@
 **验证范围：** 自动测试通过模拟模型服务验证请求格式、流水线、质检失败处理、取消、续做、版本与本地交付。发布环境没有配置真实 API Key，因此尚未进行真实模型拆分效果验收。AI 视觉评分不等同于人工验收；补绘是生成还原，不能保证与原图或源 PSD 分层逐像素一致。
 
 API 参数依据：[图像编辑](https://developers.openai.com/api/reference/resources/images/methods/edit)、[结构化输出](https://developers.openai.com/api/docs/guides/structured-outputs)、[图像生成说明](https://developers.openai.com/api/docs/guides/image-generation)。
+
+## 组件二次拆分（0.3.0-beta.2）
+
+在素材网格中选中一张已保存的素材，在「素材属性」点击「再次拆分组件」。填写具体要求（可选），例如“把头像、金色边框、皇冠分别拆开，边框中央透明，补齐遮挡边缘”，然后开始二次拆分。
+
+- 以选中 PNG 的实际像素为参考继续细分，不重复生成整张 UI；至少识别两个独立子组件。
+- 保留来源素材和其他已保存素材的 ID 与 PNG 字节，追加新组件并创建新版本。子组件仍可继续细分。
+- 每项检查真实 Alpha 与模型视觉结果；空心边框、无字底板、独立文字等按拆分描述分别处理。失败保留进度，可取消、续做；版本有变化时拒绝覆盖。
+- 按当前偏好独立本地保存并打开，manifest、catalog 与 ZIP 都保留来源记录。
+- 未配置模型也可以复制「Codex 二次拆分指令」，使用本地 Codex 的图像工具处理；这与网页内独立 AI 引擎是两条执行方式。
+
+接口沿用 `POST /api/ui/:id/ai`，请求 `{expectedVersion, targetId, instructions}`；省略 targetId 仍为整图拆分。新组件的 `lineage` 保存 parentId、sourceVersion、来源 PNG 的 width/height 及其中的像素 rect。普通 rect 为映射到整张 UI 的参考范围，AI 重建后不保证像素级排版精度。只完成局部补绘时保留原有整图补绘状态，不把未验收的背景标记为完成。CLI spec 和 MCP 回传均支持 lineage。
+
+二次拆分使用相同模型服务与计费规则。已通过隔离模拟服务的自动测试和浏览器流程检查，真实 API 图像质量尚未验收。
 
 ## 已统一的默认要求
 
