@@ -1,5 +1,14 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-3',version:'0.3.0-beta.3',date:'2026-10-30',title:'UI Studio · 内置版本说明与下载页',unread:true,
+    summary:'版本说明和下载入口纳入 UI Studio，随工具包一起交付。在本地查看当前安装版本、具体更新内容和对应下载，不再依赖线上说明页。',
+    releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.3',
+    changes:[
+      {type:'new',text:'工作台顶部及底部加入“版本与下载”入口，打开本机 /updates/ 页面，并保留当前素材工作台。'},
+      {type:'new',text:'内置更新分类、搜索、时间线、展开详情和已读记录；每一版都列出具体改动。'},
+      {type:'improved',text:'版本号直接读取工具包版本，与内置更新记录和对应 GitHub 下载地址保持一致；启动时检查版本数据是否匹配。'},
+      {type:'improved',text:'更新页复用 UI Studio 品牌、中文字体与滚动条，页面和字体随工具提供，离线可查看更新；下载工具包时才需联网。'},
+      {type:'fixed',text:'明确区分工具更新说明与素材版本历史；分发包包含完整本地更新页面，不将公开网站误作在线拆分工具。'}]},
   {id:'ui-studio-0-3-0-beta-2',version:'0.3.0-beta.2',date:'2026-10-30',title:'UI Studio · 组件二次拆分',unread:true,
     summary:'选中已经拆出的素材，继续拆成更细的独立透明组件，例如头像、边框、皇冠、按钮底板与文字。保留原素材和其他素材，新增版本并保存到本地。通过 24 项自动测试和模拟服务的浏览器流程检查；真实 API 图像质量尚未验收。',
     releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.2',

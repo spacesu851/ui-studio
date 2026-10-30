@@ -1,9 +1,11 @@
 import {createWriteStream} from 'node:fs';
-import {access} from 'node:fs/promises';
+import {access,readFile} from 'node:fs/promises';
+import {releaseInfo} from '../shared/releases.mjs';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import archiver from 'archiver';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),output=path.resolve(root,'../ui-studio.zip');
+releaseInfo(JSON.parse(await readFile(path.join(root,'package.json'),'utf8')).version);
 await access(path.join(root,'dist/index.html'));
 const stream=createWriteStream(output),zip=archiver('zip',{zlib:{level:7}});const done=new Promise((resolve,reject)=>{stream.on('close',resolve);stream.on('error',reject);zip.on('error',reject)});zip.pipe(stream);
 for(const folder of ['src','server','bridge','shared','scripts','public','tests','dist','licenses','site'])zip.directory(path.join(root,folder),`ui-studio/${folder}`,entry=>entry.name.toLowerCase().endsWith('.ps1')?false:entry);

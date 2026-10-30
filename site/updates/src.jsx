@@ -4,6 +4,7 @@ import {OverlayScrollbars} from 'overlayscrollbars';
 import 'overlayscrollbars/overlayscrollbars.css';
 import {createChangelogPro} from './ChangelogPro.mjs';
 import {changelogReleases} from './releases.mjs';
+import './fonts.css';
 import './changelog-pro.css';
 import './page.css';
 const Changelog=createChangelogPro(React,OverlayScrollbars),latest=changelogReleases[0];

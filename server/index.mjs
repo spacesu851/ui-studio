@@ -9,8 +9,10 @@ import {LocalExports} from './local-exports.mjs';
 import {inspectMaterials} from './materials.mjs';
 import {AiSettings,OpenAiProvider} from './ai-provider.mjs';
 import {AiJobs} from './ai-jobs.mjs';
+import {releaseInfo} from '../shared/releases.mjs';
 const here=path.dirname(fileURLToPath(import.meta.url)),root=path.dirname(here);
 export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(root,'data'),exportRoot=process.env.UI_STUDIO_EXPORT_ROOT||path.join(root,'../ui-studio-exports'),openDirectory,production=false,aiEnvironment=process.env,aiProviderFactory=config=>new OpenAiProvider(config)}={}){
+  const info=releaseInfo(JSON.parse(await readFile(path.join(root,'package.json'),'utf8')).version);
   const store=await new Store(dataDir).init(),app=express();
   const local=new LocalExports(store,exportRoot,openDirectory);
   const aiSettings=new AiSettings(store.db,aiEnvironment),aiJobs=new AiJobs(store,aiSettings,local,{providerFactory:aiProviderFactory});
@@ -21,6 +23,7 @@ export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(r
     res.setHeader('X-Content-Type-Options','nosniff');next();});
   app.use('/api',express.json({limit:'32mb'}));
   app.get('/api/health',(req,res)=>res.json({ok:true,engine:'独立 AI 识别 + 透明提取 + 补绘 + 视觉质检',storage:'local',bridgeVersion:'3',aiConfigured:aiSettings.public().configured}));
+  app.get('/api/release',(req,res)=>res.json(info));
   app.get('/api/ai/settings',(req,res)=>res.json(aiSettings.public()));
   app.post('/api/ai/settings',(req,res)=>res.json(aiSettings.update(req.body)));
   app.post('/api/ai/test',async(req,res)=>res.json(await aiProviderFactory(aiSettings.snapshot()).test()));

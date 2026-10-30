@@ -2,9 +2,17 @@
 
 按用户提供的抖音视频界面和操作流程制作的本地 UI 拆图与素材版本工具。默认地址：**http://127.0.0.1:4763**。
 
-**独立 AI 版本下载：[v0.3.0-beta.2 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.2)。旧 v0.2.0 只有管理与桥接功能，不包含独立 AI 引擎。**
+**独立 AI 版本下载：[v0.3.0-beta.3 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.3)。旧 v0.2.0 只有管理与桥接功能，不包含独立 AI 引擎。**
 
-版本号与具体更新：[拾羽集更新日志](https://www.opsu.cc/updates/)。更新页源码与数据在 `site/updates/`。
+版本号、更新说明和下载入口均随 UI Studio 提供：启动后点击工作台顶部“版本与下载”，或打开 [本机更新页](http://127.0.0.1:4763/updates/)。该页面离线可查看；下载会前往对应 GitHub 发布包。
+
+## 内置版本与下载（0.3.0-beta.3）
+
+- 更新页位于本机 `/updates/`，与工作台使用同一个服务；入口在顶部和底部，另开页面以保留素材编辑状态。
+- `package.json` 为当前安装版本；`site/updates/releases.mjs` 是共享更新记录，随工具包交付。`shared/releases.mjs` 检查最新记录与工具版本匹配，并生成对应下载地址。
+- 当前安装版本、具体改动、筛选、搜索、时间线、已读记录可离线查看。字体与样式复用本地工具资源。下载安装包、浏览 GitHub 历史版本需要联网；此功能不自动安装更新。
+- `GET /api/release` 返回当前工具版本、内置更新记录和对应下载链接。制作下一版时，同时更新 package.json、package-lock.json 和共享更新记录，再构建、测试、打包。
+- ChangelogPro 使用用户提供的组件；公开网站如需展示，可以复用同一份数据作为镜像，工具不依赖镜像站运行。
 
 ## 独立 AI 拆分（0.3 新增）
 
