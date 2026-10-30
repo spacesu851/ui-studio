@@ -4,6 +4,8 @@
 
 **独立 AI 版本下载：[v0.3.0-beta.1 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.1)。旧 v0.2.0 只有管理与桥接功能，不包含独立 AI 引擎。**
 
+版本号与具体更新：[拾羽集更新日志](https://www.opsu.cc/updates/)。更新页源码与数据在 `site/updates/`。
+
 ## 独立 AI 拆分（0.3 新增）
 
 不再需要把任务复制到 Codex 聊天里手工执行。使用者在网页的「AI 设置」填写自己的 OpenAI API Key，上传并打开 UI 后点「开始 AI 拆分」。工具自动执行：

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node server/index.mjs",
     "build": "vite build",
+    "build:updates": "vite build --config site/updates/vite.config.mjs",
     "start": "node server/index.mjs --production",
     "test": "node --test tests/*.test.mjs",
     "bridge": "node bridge/cli.mjs",
