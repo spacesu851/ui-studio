@@ -1,5 +1,12 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-10',version:'0.3.0-beta.10',date:'2026-10-31',title:'UI Studio · 三步分页复刻向导',unread:true,
+    summary:'复刻改为一个弹窗、每页一个步骤：分析原图、确认方案、预览保存。每页只展示当前操作，底部固定上一步与下一步，不再把全部功能挤在一起。',
+    releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.10',changes:[
+      {type:'new',text:'第 1 页选类型与策略并分析原图；第 2 页检查底板、代码文字与图标并确认生成；第 3 页检查网页预览、交互与代码，保存版本和本地文件。'},
+      {type:'fixed',text:'分析完成自动进入确认页，确认生成后才进入预览页；分析与生成明确区分，避免重复分析却没有预览。'},
+      {type:'improved',text:'固定页头与底部导航，仅中间内容滚动；返回上一步保留当前方案，可直接下一步继续。手动导入与方案 JSON 保持折叠，生成仍由设计师明确确认。'},
+      {type:'fixed',text:'确认生成使用同步请求锁，防止顶部和底部按钮连续点击造成重复处理；修改识别类型或策略后需重新分析。'}]},
   {id:'ui-studio-0-3-0-beta-9',version:'0.3.0-beta.9',date:'2026-10-31',title:'UI Studio · 本地任务隔离与分析反馈',unread:true,
     summary:'延续直连本地 Codex，隔离专用图像任务与项目代码指令；修正候选分析状态被全局浮动提示样式影响的问题。',
     releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.9',changes:[
