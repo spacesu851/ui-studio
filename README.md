@@ -2,7 +2,7 @@
 
 按用户提供的抖音视频界面和操作流程制作的本地 UI 拆图与素材版本工具。默认地址：**http://127.0.0.1:4763**。
 
-**版本下载：[v0.3.0-beta.8 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.8)。默认直连本地 Codex；OpenAI API 作为可选引擎保留。**
+**版本下载：[v0.3.0-beta.9 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.9)。默认直连本地 Codex；OpenAI API 作为可选引擎保留。**
 
 版本号、更新说明和下载入口均随 UI Studio 提供：启动后点击工作台顶部“版本与下载”，或打开 [本机更新页](http://127.0.0.1:4763/updates/)。该页面离线可查看；下载会前往对应 GitHub 发布包。
 
@@ -18,6 +18,8 @@
 本地 Codex 仍需联网，图片会交给 Codex 使用的模型服务，额度和可用功能受登录账号影响。分发给别人时，对方使用自己的本机 Codex 登录；发布包不含你的账号、API Key 或用户素材。连接检测只检查 CLI 和登录状态，不宣称图像工具权限已验证。
 
 任务通过 `shell:false` 参数数组调用官方 CLI，使用 `--ephemeral`、`--ignore-user-config`、`--sandbox read-only` 和结构化输出。分析禁用工具；图像编辑禁用 shell/浏览器等工具，返回图像工具原始 PNG 路径，由应用接收。本地状态和任务记录位于 `data/codex-tasks/`，不会发布到 GitHub；不读取或复制 Codex 凭据文件。接口依据：[Codex 非交互模式](https://learn.chatgpt.com/docs/non-interactive-mode)。
+
+图像专用任务通过 `project_doc_max_bytes=0` 不加载父项目的 AGENTS.md，只接收当前视觉处理要求；Codex 的管理策略和沙箱仍然生效。候选分析进度固定在分析按钮下方。
 
 已在开发机实际验证无 UI Studio API Key 的图片识别，以及本地图像工具生成透明 PNG 并回传。自动测试另外覆盖模拟引擎下的设计师确认、结果发布、原素材保留与独立本地交付。真实图像连接验证不代表 90% 复刻率已通过，具体组件仍需设计师对照验收。
 

@@ -1,5 +1,10 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-9',version:'0.3.0-beta.9',date:'2026-10-31',title:'UI Studio · 本地任务隔离与分析反馈',unread:true,
+    summary:'延续直连本地 Codex，隔离专用图像任务与项目代码指令；修正候选分析状态被全局浮动提示样式影响的问题。',
+    releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.9',changes:[
+      {type:'fixed',text:'分析状态保持在按钮下方，不再被全局 busy 提示条样式移动到弹窗底部。'},
+      {type:'improved',text:'图片专用任务不加载父项目的 AGENTS.md，使用明确的视觉处理指令，避免误接项目开发任务；仍遵守 CLI 管理策略、只读沙箱和设计师确认流程。'}]},
   {id:'ui-studio-0-3-0-beta-8',version:'0.3.0-beta.8',date:'2026-10-31',title:'UI Studio · 直连本地 Codex',unread:true,
     summary:'默认复用本机 Codex CLI 登录，直接分析原图、提出拆分和 HTML/CSS 候选，确认后完成透明提取、补绘与结果回传；无需在 UI Studio 填写 API Key。',
     releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.8',changes:[
