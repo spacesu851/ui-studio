@@ -9,10 +9,12 @@ function deferred(load,name,{dialog=false}={}){
  return function DeferredFeature(props){
   const [attempt,setAttempt]=useState(0),Loaded=useMemo(()=>lazy(()=>load().then(module=>({default:module[name]}))),[attempt]);
   const wrap=content=>dialog?<MotionBackdrop><section className="modal" role="dialog" aria-modal="true" aria-label="正在加载功能">{content}</section></MotionBackdrop>:content;
-  return <FeatureError key={attempt} wrap={wrap} onRetry={()=>setAttempt(v=>v+1)} onClose={props.onClose}><Suspense fallback={wrap(<div className="feature-loading" role="status">正在加载{name==='SettingsDialog'?'处理引擎设置':name==='HtmlComponentDialog'?'组件复刻工具':'页面'}…{props.onClose&&<button className="button" onClick={props.onClose}>取消</button>}</div>)}><Loaded {...props}/></Suspense></FeatureError>;
+  return <FeatureError key={attempt} wrap={wrap} onRetry={()=>setAttempt(v=>v+1)} onClose={props.onClose}><Suspense fallback={wrap(<div className="feature-loading" role="status">正在加载{name==='SettingsDialog'?'处理引擎设置':name==='HtmlComponentDialog'?'组件复刻工具':name==='AssetDetailsDialog'?'素材详情':'页面'}…{props.onClose&&<button className="button" onClick={props.onClose}>取消</button>}</div>)}><Loaded {...props}/></Suspense></FeatureError>;
  }
 }
 export const SettingsDialog=deferred(()=>import('./EngineSettings.jsx'),'SettingsDialog',{dialog:true});
 export const HtmlComponentDialog=deferred(()=>import('./HtmlComponentDialog.jsx'),'HtmlComponentDialog',{dialog:true});
 export const ReviewPage=deferred(()=>import('./ReviewPage.jsx'),'ReviewPage');
 export const UpdatesPage=deferred(()=>import('./UpdatesPage.jsx'),'UpdatesPage');
+
+export const AssetDetailsDialog=deferred(()=>import('./AssetDetailsDialog.jsx'),'AssetDetailsDialog',{dialog:true});
