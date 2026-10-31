@@ -1,5 +1,12 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-7',version:'0.3.0-beta.7',date:'2026-10-31',title:'UI Studio · 修复候选分析反馈',unread:true,
+    summary:'修复点击候选方案像没有反应的问题：操作状态、失败原因与下一步入口就在分析按钮下方；区分已保存组件的离线预览与重新调用 AI 分析。',
+    releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.7',changes:[
+      {type:'fixed',text:'点击后立即显示检查配置、分析中等状态，禁用重复点击；完成后自动展示待设计师确认的候选方案。'},
+      {type:'fixed',text:'未配置 AI 时，在按钮旁明确显示“未开始分析”，提供同窗 AI 设置与本地 Codex/导入方案入口，不再把唯一错误提示藏在弹窗底部。'},
+      {type:'improved',text:'已有组件明确显示可直接预览和编辑，重新分析按钮注明 AI；错误包含断网、无效服务响应、版本冲突等原因。'},
+      {type:'fixed',text:'设计师手动导入的纯 CSS/SVG 候选可确认后离线编译，无需 API；新图片分析、去字和图像生成仍需要模型服务，不伪造离线分析结果。'}]},
   {id:'ui-studio-0-3-0-beta-6',version:'0.3.0-beta.6',date:'2026-10-31',title:'UI Studio · 组件对照与设计师验收',unread:true,
     summary:'把原图对照、网页试用、文字编辑、状态预览、设计师结论和本地交付集中到复刻验收页。已保存的组件无需 API 即可预览验收；独立 AI 识别与补绘仍使用接收者自己的模型设置。',
     releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.6',changes:[

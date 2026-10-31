@@ -2,7 +2,7 @@
 
 按用户提供的抖音视频界面和操作流程制作的本地 UI 拆图与素材版本工具。默认地址：**http://127.0.0.1:4763**。
 
-**独立 AI 版本下载：[v0.3.0-beta.6 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.6)。旧 v0.2.0 只有管理与桥接功能，不包含独立 AI 引擎。**
+**独立 AI 版本下载：[v0.3.0-beta.7 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.7)。旧 v0.2.0 只有管理与桥接功能，不包含独立 AI 引擎。**
 
 版本号、更新说明和下载入口均随 UI Studio 提供：启动后点击工作台顶部“版本与下载”，或打开 [本机更新页](http://127.0.0.1:4763/updates/)。该页面离线可查看；下载会前往对应 GitHub 发布包。
 
@@ -234,3 +234,7 @@ npm start
 设计师可记录“通过”“需要调整”及意见。服务校验 expectedVersion 与组件摘要，未保存的修改不能误标通过。新版本重新待验收，旧版本意见保留。每次提交意见按本地保存偏好创建独立交付目录，review-report.json 同时随本地目录和完整素材 ZIP 提供。发布 ZIP 不包含本机验收样例和用户图片。
 
 接口：GET /api/ui/:id/reviews?version=N；POST /api/ui/:id/reviews，字段 expectedVersion、targetId、digest、status(pending/approved/changes-requested)、note。
+
+## 候选分析反馈（0.3.0-beta.7）
+
+“分析候选方案（AI）”先检查本机服务配置，再显示分析中状态；按钮旁显示阻塞原因，并提供同窗设置和本地 Codex/导入方案入口。已有 htmlComponent 打开即可预览和编辑，重新分析单独注明会调用 AI。新素材分析需要模型服务；设计师确认的纯 CSS/SVG 导入方案可以本地编译，无需 API。未配置服务时不会发送图片、伪造候选或改写素材。

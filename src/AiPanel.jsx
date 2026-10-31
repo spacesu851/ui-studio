@@ -32,7 +32,7 @@ export function AiPanel({ui,disabled,onComplete,refineTarget,onRefineClose,onCop
   </section>;
 }
 
-function SettingsDialog({value,onClose,onSave}){
+export function SettingsDialog({value,onClose,onSave}){
   const [form,setForm]=useState({...value,apiKey:''}),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
   const change=(key,value)=>setForm(v=>({...v,[key]:value}));
   async function save(test=false){setBusy(true);setError('');setNotice('');try{const saved=await request('/ai/settings',form);setForm(v=>({...v,...saved,apiKey:''}));if(test){const checked=await request('/ai/test',{});setNotice(checked.message);}else onSave(saved);}catch(e){setError(e.message)}finally{setBusy(false)}}
