@@ -5,6 +5,7 @@ import {randomBytes} from 'node:crypto';
 import {decodeImage,extract,validateElements,elementId} from './image.mjs';
 import {processingOptions,processingReport} from '../shared/processing.mjs';
 import {alphaInfo,materialDetails} from './materials.mjs';
+import {Tasks} from './tasks.mjs';
 export class Store {
   constructor(root){this.root=path.resolve(root);}
   async init(){await mkdir(this.root,{recursive:true});this.db=new DatabaseSync(path.join(this.root,'studio.sqlite'));this.db.exec(`PRAGMA journal_mode=WAL;
@@ -12,7 +13,7 @@ export class Store {
     CREATE TABLE IF NOT EXISTS uis(id TEXT PRIMARY KEY,folder_id TEXT NOT NULL,title TEXT NOT NULL,latest INTEGER NOT NULL,updated TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS versions(ui_id TEXT NOT NULL,number INTEGER NOT NULL,json TEXT NOT NULL,PRIMARY KEY(ui_id,number));
     CREATE TABLE IF NOT EXISTS ui_preferences(ui_id TEXT PRIMARY KEY,json TEXT NOT NULL);`);
-    if(!this.db.prepare('SELECT id FROM folders LIMIT 1').get())this.createFolder('我的 UI 合集');return this;}
+    this.tasks=new Tasks(this.db);this.tasks.indexHistory();if(!this.db.prepare('SELECT id FROM folders LIMIT 1').get())this.createFolder('我的 UI 合集');return this;}
   createFolder(title){const id=`GROUP-${randomBytes(4).toString('hex')}`;this.db.prepare('INSERT INTO folders VALUES(?,?,?)').run(id,String(title||'新合集').slice(0,100),new Date().toISOString());return {id};}
   folders(){return this.db.prepare('SELECT f.*,COUNT(u.id) AS count FROM folders f LEFT JOIN uis u ON u.folder_id=f.id AND u.latest>0 GROUP BY f.id ORDER BY f.created').all();}
   list(folder){return this.db.prepare('SELECT * FROM uis WHERE folder_id=? AND latest>0 ORDER BY updated DESC').all(folder).map(u=>({...u,...this.version(u.id)}));}
@@ -20,12 +21,13 @@ export class Store {
   preferences(id){this.ui(id);const row=this.db.prepare('SELECT json FROM ui_preferences WHERE ui_id=?').get(id);return processingOptions(row?JSON.parse(row.json):{});}
   setPreferences(id,value){const next=processingOptions({...this.preferences(id),...value});this.db.prepare('INSERT INTO ui_preferences VALUES(?,?) ON CONFLICT(ui_id) DO UPDATE SET json=excluded.json').run(id,JSON.stringify(next));return next;}
   version(id,number){const u=this.ui(id),n=number?Number(number):u.latest;const v=this.db.prepare('SELECT json FROM versions WHERE ui_id=? AND number=?').get(id,n);if(!v)throw Object.assign(new Error('版本不存在'),{status:404});return JSON.parse(v.json);}
-  history(id){this.ui(id);return this.db.prepare('SELECT json FROM versions WHERE ui_id=? ORDER BY number DESC').all(id).map(v=>{const m=JSON.parse(v.json);return {version:m.version,note:m.note,created:m.created,source:m.source,count:m.elements.length,original:m.original};});}
+  history(id){this.ui(id);return this.db.prepare('SELECT json FROM versions WHERE ui_id=? ORDER BY number DESC').all(id).map(v=>{const m=JSON.parse(v.json);return {version:m.version,taskId:m.taskId||this.tasks.forVersion(id,m.version)?.id,note:m.note,created:m.created,source:m.source,count:m.elements.length,original:m.original};});}
   file(url){const rel=String(url).replace(/^\/media\//,'');const p=path.resolve(this.root,rel);if(!p.startsWith(this.root+path.sep))throw new Error('文件路径不合法');return p;}
   async create({folder,title,image}){if(!this.db.prepare('SELECT id FROM folders WHERE id=?').get(folder))throw new Error('合集不存在');const id=`UI-${randomBytes(4).toString('hex')}`;
     const decoded=await decodeImage(image);this.db.prepare('INSERT INTO uis VALUES(?,?,?,?,?)').run(id,folder,String(title||'未命名 UI').slice(0,100),0,new Date().toISOString());
     try{return await this.publish(id,{expectedVersion:0,note:'上传原始 UI',source:'网页上传',elements:[]},decoded);}catch(e){this.db.prepare('DELETE FROM uis WHERE id=? AND latest=0').run(id);throw e;}}
   async publish(id,input,decoded){const ui=this.ui(id);if(!Number.isInteger(input.expectedVersion)||input.expectedVersion!==ui.latest)throw Object.assign(new Error('已有新版本，请先同步后再提交'),{status:409});
+    const task=input.taskId?this.tasks.forUI(input.taskId,id,input.expectedVersion):this.tasks.make({uiId:id,baseVersion:input.expectedVersion,kind:ui.latest?'version':'upload'});if(task.version)throw Object.assign(Error('该任务已发布，请使用新的拆分任务 ID'),{status:409});
     const prev=ui.latest?this.version(id):null,processing=processingOptions({...this.preferences(id),...input.processing});
     if(!decoded)decoded=input.image?await decodeImage(input.image):{png:await readFile(this.file(prev.original)),width:prev.width,height:prev.height};
     const incoming=input.elements===undefined?(prev?.elements||[]):input.elements;
@@ -51,9 +53,9 @@ export class Store {
       if(details.role==='component'&&processing.transparentComponents&&!alpha.hasTransparency)throw new Error(`素材“${m.name||eid}”没有实际透明像素。请先去背景；完整底图需明确标记 role=background。`);
       if(details.role==='component'&&!alpha.hasVisiblePixels)throw new Error(`素材“${m.name||eid}”完全透明，没有可见内容`);
       await writeFile(path.join(directory,`${eid}.png`),asset.png);elements.push({id:eid,name:String(m.name||'导入素材').slice(0,100),rect,kind:'imported',...details,alpha,removeBackground:false,tolerance:30,pixelWidth:asset.width,pixelHeight:asset.height,url:`${base}/${eid}.png`});}
-    const manifest={schema:'imageos.ui/v1',id,title:ui.title,folder:ui.folder_id,version:number,created:new Date().toISOString(),note:String(input.note||'更新素材').slice(0,1000),source:String(input.source||'本地 Codex').slice(0,50),processing,processingReport:report,width:decoded.width,height:decoded.height,original:`${base}/original.png`,elements};
+    const manifest={schema:'imageos.ui/v1',id,taskId:task.id,title:ui.title,folder:ui.folder_id,version:number,created:new Date().toISOString(),note:String(input.note||'更新素材').slice(0,1000),source:String(input.source||'本地 Codex').slice(0,50),processing,processingReport:report,width:decoded.width,height:decoded.height,original:`${base}/original.png`,elements};
     this.db.exec('BEGIN IMMEDIATE');try{if(this.ui(id).latest!==input.expectedVersion)throw Object.assign(new Error('提交冲突，请先同步最新版本'),{status:409});
-      this.db.prepare('INSERT INTO versions VALUES(?,?,?)').run(id,number,JSON.stringify(manifest));this.db.prepare('UPDATE uis SET latest=?,updated=? WHERE id=?').run(number,manifest.created,id);this.db.exec('COMMIT');
+      this.db.prepare('INSERT INTO versions VALUES(?,?,?)').run(id,number,JSON.stringify(manifest));this.db.prepare('UPDATE uis SET latest=?,updated=? WHERE id=?').run(number,manifest.created,id);this.tasks.save({...task,status:'completed',version:number,title:manifest.note,source:manifest.source,assets:elements.map(e=>({id:e.id,name:e.name,role:e.role}))});this.db.exec('COMMIT');
     }catch(e){this.db.exec('ROLLBACK');throw e;}return manifest;
   }
   async restore(id,version,expectedVersion){const m=this.version(id,version),png=await readFile(this.file(m.original));

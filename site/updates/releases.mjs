@@ -1,5 +1,15 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-11',version:'0.3.0-beta.11',date:'2026-10-31',title:'UI Studio · 全局分阶段工作流与拆分任务 ID',unread:true,
+    summary:'整个 UI Studio 按准备原图、拆分素材、复刻组件、验收效果、本地交付五个阶段组织。每次处理有独立 SPLIT 任务 ID，Codex 可查询来源、状态和结果，并继续未完成的组件方案。',
+    releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.11',changes:[
+      {type:'improved',text:'项目库聚焦导入与打开项目；准备页集中原图、处理要求和引擎连接；拆分页集中候选与进度；复刻页保留原图/素材布局和固定的选中素材操作条。'},
+      {type:'new',text:'全局五阶段导航和固定的上一步/下一步；验收页专注对照与设计师结论，本地路径、ZIP 和组件工程统一放到交付页。PNG 素材也可直接交付。'},
+      {type:'new',text:'整图拆分、再次拆分、组件复刻与每次版本保存都有独立 SPLIT 任务 ID，关联 UI、来源素材、来源版本、状态和结果版本；ID 随本地 manifest 与清单交付。'},
+      {type:'new',text:'任务记录支持复制 ID、任务链接、Codex 指令和继续组件复刻。CLI task/tasks 与 MCP get_split_task/list_ui_tasks 按同一个 ID 读取；Codex 模型任务也带上这些来源标识。'},
+      {type:'improved',text:'关闭组件弹窗后，已分析方案和未保存预览保存在本机任务记录，可按任务 ID 继续；历史版本补建查询索引，原快照保持不变。'},
+      {type:'security',text:'拒绝用其他 UI 或其他来源版本的任务 ID 回传；同一任务只关联一次结果发布。正在运行的拆分需等待或取消后再由 Codex 接手回传。'},
+      {type:'fixed',text:'更新页直接下载链接改为与实际发布包一致的版本文件名，工具版本、说明和 GitHub 包同步。'}]},
   {id:'ui-studio-0-3-0-beta-10',version:'0.3.0-beta.10',date:'2026-10-31',title:'UI Studio · 三步分页复刻向导',unread:true,
     summary:'复刻改为一个弹窗、每页一个步骤：分析原图、确认方案、预览保存。每页只展示当前操作，底部固定上一步与下一步，不再把全部功能挤在一起。',
     releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.10',changes:[

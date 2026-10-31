@@ -52,7 +52,7 @@ await test('UI lifecycle, local Codex round trip, immutable history, conflicts a
     });
     await t.test('MCP lists tools and retrieves same UI ID',async()=>{
       const client=new Client({name:'ui-studio-test',version:'1.0.0'});const transport=new StdioClientTransport({command:process.execPath,args:[path.join(root,'bridge/mcp.mjs')],env:{...process.env,UI_STUDIO_URL:url}});
-      try{await client.connect(transport);const list=await client.listTools();assert.equal(list.tools.length,7);const res=await client.callTool({name:'get_ui',arguments:{id}});const value=JSON.parse(res.content[0].text);assert.equal(value.version,5);assert.equal(value.context.requirements.inpaintOccluded,true);assert.equal(value.context.localExport.status,'saved');}finally{await client.close()}
+      try{await client.connect(transport);const list=await client.listTools();assert.equal(list.tools.length,9);const res=await client.callTool({name:'get_ui',arguments:{id}});const value=JSON.parse(res.content[0].text);assert.equal(value.version,5);assert.equal(value.context.requirements.inpaintOccluded,true);assert.equal(value.context.localExport.status,'saved');const taskResult=await client.callTool({name:'get_split_task',arguments:{id:value.taskId}});const task=JSON.parse(taskResult.content[0].text);assert.equal(task.uiId,id);assert.equal(task.version,5);}finally{await client.close()}
     });
     await t.test('database stays private and off-origin browser writes fail',async()=>{
       assert.equal((await fetch(url+'/media/studio.sqlite')).status,404);

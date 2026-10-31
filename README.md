@@ -2,9 +2,23 @@
 
 按用户提供的抖音视频界面和操作流程制作的本地 UI 拆图与素材版本工具。默认地址：**http://127.0.0.1:4763**。
 
-**版本下载：[v0.3.0-beta.10 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.10)。默认直连本地 Codex；OpenAI API 作为可选引擎保留。**
+**版本下载：[v0.3.0-beta.11 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.11)。默认直连本地 Codex；OpenAI API 作为可选引擎保留。**
 
 版本号、更新说明和下载入口均随 UI Studio 提供：启动后点击工作台顶部“版本与下载”，或打开 [本机更新页](http://127.0.0.1:4763/updates/)。该页面离线可查看；下载会前往对应 GitHub 发布包。
+
+## 全局流程与独立拆分 ID（0.3.0-beta.11）
+
+项目库负责导入与打开 UI，项目内按五个阶段操作：**准备原图 → 拆分素材 → 复刻组件 → 验收效果 → 本地交付**。每页聚焦当前任务，固定上一步/下一步；高级联动、历史、素材属性按需展开。已有素材直接进入复刻页；只需要 PNG 时也可直接交付。
+
+每次整图拆分、再次细分、组件复刻或版本处理都会产生持久的 `SPLIT-…` 任务 ID。它与 UI ID、来源素材、来源版本、状态和结果版本分别关联；界面可复制 ID、任务链接和 Codex 指令，本地 manifest/catalog 保留同一 ID。未保存的组件方案和已生成预览可从任务记录继续。旧版本只补建稳定的任务查询索引，不改写原快照，也不补造过去的模型执行日志。
+
+```sh
+node bridge/cli.mjs tasks --id UI-xxxxxxxx
+node bridge/cli.mjs task --id SPLIT-xxxxxxxxxxxxxxxx
+node bridge/cli.mjs publish --id UI-xxxxxxxx --task SPLIT-xxxxxxxxxxxxxxxx --base 2 --spec materials.json --note "回传这次任务的结果"
+```
+
+MCP 使用 `list_ui_tasks`、`get_split_task` 查询，回传可带 `task_id`；HTTP 使用 `GET /api/ui/:id/tasks`、`GET /api/tasks/:task`。任务链接 `/task/SPLIT-…` 会打开对应 UI 的任务记录。回传需匹配 UI、来源版本与素材；同一任务不能重复发布。运行中的拆分要等待或取消后才能由本地 Codex 接手回传。任务记录不含 API Key 或 Codex 凭据。
 
 ## 直连本地 Codex（0.3.0-beta.8，当前默认）
 
