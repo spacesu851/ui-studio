@@ -1,5 +1,18 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-5',version:'0.3.0-beta.5',date:'2026-10-31',title:'UI Studio · 设计师确认与交互组件复刻',unread:true,
+    summary:'复刻不限于按钮：自动识别或手动选择面板、卡片、标签、文字、图标、输入框、进度条等。尽量用 CSS 绘制，复杂图形使用去字图片底图；所有识别文字作为独立可编辑代码。真实模型还原质量尚未验收。',
+    releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.5',changes:[
+      {type:'new',text:'再次拆分先提出候选，设计师选择、修改边界及要求后确认；确认前不生成图片。复刻方案中的 CSS/图片底板及图标去留也由设计师决定。'},
+      {type:'new',text:'按钮按原图配色与质感提出默认、移入、按下、键盘焦点、禁用状态；逐态预览并调整光晕、亮度、缩放、位移和过渡，保存与导出完整 CSS。静态装饰不添加交互。'},
+      {type:'improved',text:'入口统一为“复刻 HTML5 + CSS”，按组件类型生成结构，静态组件没有按钮的点击、悬停与按下效果。'},
+      {type:'new',text:'识别标题、说明、数值和提示等多条文字，逐项编辑内容、位置和字号；文字不再固定在图片中。'},
+      {type:'improved',text:'单纯外框和微渐变用 CSS；复杂发光/玻璃/金属质感使用完整去字底图，以保真优先，再叠加代码文字；去字检查失败时不发布带原字的结果。'},
+      {type:'new',text:'支持手动上传无字底图和导入组件 JSON；本地目录与 ZIP 保留原图参考、去字底图、HTML、CSS、文字与样式配置。'},
+      {type:'new',text:'小图标优先 SVG，复杂或遮挡图标生成透明 PNG 并补绘，独立图层预览、调整位置，并将 SVG/PNG 随代码一起导出。'},
+      {type:'new',text:'整体还原度目标 ≥90%，可将浏览器栅格化的 HTML 与原图交给视觉模型比对，显示估算分数与问题；编辑后旧评分失效，不冒充人工验收。'},
+      {type:'improved',text:'SVG 优先，PNG 按展示尺寸的约 2 倍交付，保留原图；分离资源可缓存，原生交互不依赖额外运行库。'},
+      {type:'fixed',text:'输入框使用真实 input，进度条提供进度语义，旧版按钮配置及历史版本保持兼容。'}]},
   {id:'ui-studio-0-3-0-beta-4',version:'0.3.0-beta.4',date:'2026-10-31',title:'UI Studio · 按原图复刻 HTML5 + CSS 按钮',unread:true,
     summary:'在素材属性中把选中的按钮复刻为 HTML5 + CSS。提供原图对照、原图贴图与 CSS 绘制两种方式，可调整文字、尺寸和样式参数，并保存版本与本地代码。CSS 识别按原图分析，不套用通用模板；真实模型复刻质量尚未验收。',
     releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.4',
