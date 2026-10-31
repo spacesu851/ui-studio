@@ -1,5 +1,9 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-12',version:'0.3.0-beta.12',date:'2026-10-31',title:'UI Studio · 素材与功能按需加载',unread:true,summary:'项目缩略图、素材列表、同合集预览与拆分结果按可见区域加载；组件复刻、验收、引擎设置和更新页面按需加载独立代码包。',releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.12',changes:[
+    {type:'improved',text:'素材图片进入可视区域后才请求，兼容页面、横向缩略图和独立滚动容器；保留原有占位尺寸，异步解码，卸载时释放观察。'},
+    {type:'improved',text:'复刻弹窗、验收页、处理引擎设置与更新页改为按需下载代码和样式；显示加载反馈，失败可重试，不清空当前编辑。'},
+    {type:'improved',text:'当前工作原图优先加载；任务轮询与持久拆分 ID 保持连续，未打开功能不提前加载。'}]},
   {id:'ui-studio-0-3-0-beta-11',version:'0.3.0-beta.11',date:'2026-10-31',title:'UI Studio · 全局分阶段工作流与拆分任务 ID',unread:true,
     summary:'整个 UI Studio 按准备原图、拆分素材、复刻组件、验收效果、本地交付五个阶段组织。每次处理有独立 SPLIT 任务 ID，Codex 可查询来源、状态和结果，并继续未完成的组件方案。',
     releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.11',changes:[

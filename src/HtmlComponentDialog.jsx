@@ -1,5 +1,5 @@
 import {isLocalComponentPlan} from '../shared/component-mode.mjs';
-import {SettingsDialog} from './AiPanel.jsx';
+import {SettingsDialog} from './DeferredFeatures.jsx';
 import {componentRequest,requestComponentPlan} from './component-request.mjs';
 import {STATE_LABELS,initialInteraction} from '../shared/component-states.mjs';
 import React,{useEffect,useRef,useState} from 'react';
