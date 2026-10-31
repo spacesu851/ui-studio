@@ -1,10 +1,14 @@
-# ImageOs UI Studio 0.3
+# UI Studio 0.3
 
 按用户提供的抖音视频界面和操作流程制作的本地 UI 拆图与素材版本工具。默认地址：**http://127.0.0.1:4763**。
 
-**版本下载：[v0.3.0-beta.16 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.16)。默认直连本地 Codex；OpenAI API 作为可选引擎保留。**
+**版本下载：[v0.3.0-beta.17 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.17)。默认直连本地 Codex；OpenAI API 作为可选引擎保留。**
 
 版本号、更新说明和下载入口均随 UI Studio 提供：启动后点击工作台顶部“版本与下载”，或打开 [本机更新页](http://127.0.0.1:4763/updates/)。该页面离线可查看；下载会前往对应 GitHub 发布包。
+
+## Logo 与浏览器图标（0.3.0-beta.17）
+
+工作台、验收、版本页统一使用透明 UI 图标，移除旧 ImageOs 字标；提供透明 PNG、多尺寸 favicon、ICO 和 Apple Touch 图标。资源随工具本地打包，无需联网加载。
 
 ## 素材详情弹窗（0.3.0-beta.15）
 
@@ -258,7 +262,7 @@ npm start
 
 服务仅监听 `127.0.0.1`，校验 Host 和浏览器 Origin，不暴露数据库文件。`UI_STUDIO_DATA` 可指定另一个本地数据目录；`PORT` 可指定端口。客户端端口需要同步配置。
 
-界面沿用 ImageOs 的字体、品牌、深色基调和圆角按钮，按视频加入蓝色网格背景与双栏工作台。使用 OverlayScrollbars 2.17.0 + 官方 React 适配 0.5.7，保留原生滚动行为。字体使用本地 Inter、Noto Sans SC 与中文系统回退。
+界面沿用 ImageOs 的字体、深色基调和圆角按钮；品牌标识使用用户指定的透明 UI 图标，按视频加入蓝色网格背景与双栏工作台。使用 OverlayScrollbars 2.17.0 + 官方 React 适配 0.5.7，保留原生滚动行为。字体使用本地 Inter、Noto Sans SC 与中文系统回退。
 
 ## 验证
 
