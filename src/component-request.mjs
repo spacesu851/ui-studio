@@ -12,6 +12,7 @@ export async function componentRequest(route,{body,signal,fetcher=fetch}={}){
 export async function requestComponentPlan(uiId,input,{onProgress=()=>{},signal,fetcher=fetch}={}){
  onProgress('checking');
  const settings=await componentRequest('/ai/settings',{signal,fetcher});
+ if(!settings.configured&&settings.engine==='codex')throw new ComponentRequestError((settings.localCodex?.message||'未连接本地 Codex')+'。本次没有开始分析；请在本机登录 Codex 后检查连接，也可导入本地 Codex 已制作的方案。',428);
  if(!settings.configured)throw new ComponentRequestError('这台电脑尚未配置 AI 服务，本次没有开始分析。已有组件可直接预览；新素材可配置 AI 服务，或导入本地 Codex 制作的方案。',428);
  onProgress('analyzing');
  const result=await componentRequest(`/ui/${uiId}/html-component/plan`,{body:input,signal,fetcher});

@@ -18,7 +18,7 @@ for(let y=60;y<150;y++)for(let x=50;x<250;x++){const p=(y*300+x)*4;rgb[p]=40;rgb
 for(let y=240;y<320;y++)for(let x=80;x<220;x++){const p=(y*300+x)*4;rgb[p]=220;rgb[p+1]=60;rgb[p+2]=90;}
 const image=await sharp(rgb,{raw:{width:300,height:420,channels:4}}).png().toBuffer();
 await test('UI lifecycle, local Codex round trip, immutable history, conflicts and boundaries',async t=>{
-  const app=await createApp({dataDir:path.join(dir,'data'),exportRoot:path.join(dir,'exports'),openDirectory:async()=>{},production:true});const http=app.listen(0,'127.0.0.1');await new Promise(r=>http.once('listening',r));
+  const app=await createApp({localCodex:false,dataDir:path.join(dir,'data'),exportRoot:path.join(dir,'exports'),openDirectory:async()=>{},production:true});const http=app.listen(0,'127.0.0.1');await new Promise(r=>http.once('listening',r));
   const url=`http://127.0.0.1:${http.address().port}`;
   const call=async(route,body)=>{const r=await fetch(url+route,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{});return {status:r.status,data:await r.json()};};
   let id,v1,v2,v3;

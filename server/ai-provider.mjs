@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 
-export const AI_DEFAULTS=Object.freeze({baseUrl:'https://api.openai.com/v1',visionModel:'gpt-4.1',imageModel:'gpt-image-1.5',quality:'high',maxAssets:24});
+export const AI_DEFAULTS=Object.freeze({engine:'codex',baseUrl:'https://api.openai.com/v1',visionModel:'gpt-4.1',imageModel:'gpt-image-1.5',quality:'high',maxAssets:24});
 const object=properties=>({type:'object',properties,required:Object.keys(properties),additionalProperties:false});
 const text={type:'string'};
 const rectSchema=object(Object.fromEntries(['x','y','width','height'].map(k=>[k,{type:'integer'}])));
@@ -15,6 +15,7 @@ export function safeError(error,key=''){
 }
 export function validateConfig(input={},previous=AI_DEFAULTS){
   const result={...previous};
+  if(input.engine!==undefined){if(!['codex','api'].includes(input.engine))throw fail('不支持的处理引擎');result.engine=input.engine;}
   if(input.baseUrl!==undefined){const u=new URL(input.baseUrl);if(u.username||u.password||u.search||u.hash||!(u.protocol==='https:'||u.protocol==='http:'&&['127.0.0.1','localhost','[::1]'].includes(u.hostname)))throw fail('接口地址必须使用 HTTPS；本机服务可使用 HTTP。请勿在地址里填写密钥。');result.baseUrl=u.href.replace(/\/+$/,'');}
   for(const field of ['visionModel','imageModel'])if(input[field]!==undefined){if(typeof input[field]!=='string'||!/^[a-zA-Z0-9][a-zA-Z0-9._:/-]{0,120}$/.test(input[field]))throw fail('模型名称不合法');result[field]=input[field];}
   if(input.quality!==undefined){if(!['low','medium','high'].includes(input.quality))throw fail('图像质量不合法');result.quality=input.quality;}
@@ -22,11 +23,11 @@ export function validateConfig(input={},previous=AI_DEFAULTS){
   return result;
 }
 export class AiSettings {
-  constructor(db,env=process.env){this.db=db;db.exec('CREATE TABLE IF NOT EXISTS ai_settings(id INTEGER PRIMARY KEY,json TEXT NOT NULL)');const row=db.prepare('SELECT json FROM ai_settings WHERE id=1').get();this.config=validateConfig(row?JSON.parse(row.json):{baseUrl:env.OPENAI_BASE_URL||AI_DEFAULTS.baseUrl});this.environmentKey=env.OPENAI_API_KEY||'';this.sessionKey='';}
+  constructor(db,env=process.env,{codex}={}){this.codex=codex;this.db=db;db.exec('CREATE TABLE IF NOT EXISTS ai_settings(id INTEGER PRIMARY KEY,json TEXT NOT NULL)');const row=db.prepare('SELECT json FROM ai_settings WHERE id=1').get();const saved=row?JSON.parse(row.json):{};this.config=validateConfig({...saved,engine:saved.engine||(env.OPENAI_API_KEY?'api':'codex'),baseUrl:saved.baseUrl||env.OPENAI_BASE_URL||AI_DEFAULTS.baseUrl});this.environmentKey=env.OPENAI_API_KEY||'';this.sessionKey='';}
   get key(){return this.sessionKey||this.environmentKey;}
-  public(){return {...this.config,configured:!!this.key,keySource:this.sessionKey?'session':this.environmentKey?'environment':'none'};}
-  update(input){const config=validateConfig(input,this.config);if(input.apiKey!==undefined&&(typeof input.apiKey!=='string'||input.apiKey.length>1000||/[\r\n]/.test(input.apiKey)))throw fail('API Key 格式不合法');this.config=config;if(input.clearKey){this.sessionKey='';this.environmentKey='';}else if(input.apiKey?.trim())this.sessionKey=input.apiKey.trim();this.db.prepare('INSERT INTO ai_settings VALUES(1,?) ON CONFLICT(id) DO UPDATE SET json=excluded.json').run(JSON.stringify(config));return this.public();}
-  snapshot(){if(!this.key)throw fail('请先在 AI 设置中填写 OpenAI API Key，再开始 AI 拆分。',428);return {...this.config,apiKey:this.key};}
+  public(){const localCodex=this.codex?.status()||{ready:false,installed:false,loggedIn:false,message:'未连接本地 Codex'};return {...this.config,configured:this.config.engine==='codex'?localCodex.ready:!!this.key,apiConfigured:!!this.key,localCodex,keySource:this.config.engine==='codex'?'codex':this.sessionKey?'session':this.environmentKey?'environment':'none'};}
+  update(input){const config=validateConfig(input,this.config);if(input.apiKey!==undefined&&(typeof input.apiKey!=='string'||input.apiKey.length>1000||/[\r\n]/.test(input.apiKey)))throw fail('API Key 格式不合法');if(input.apiKey?.trim()&&input.engine===undefined)config.engine='api';this.config=config;if(input.clearKey){this.sessionKey='';this.environmentKey='';}else if(input.apiKey?.trim())this.sessionKey=input.apiKey.trim();this.db.prepare('INSERT INTO ai_settings VALUES(1,?) ON CONFLICT(id) DO UPDATE SET json=excluded.json').run(JSON.stringify(config));return this.public();}
+  snapshot(){if(this.config.engine==='codex'){if(!this.codex?.status().ready)throw fail(this.codex?.status().message||'未连接本地 Codex，请先安装并登录 Codex CLI。',428);return {...this.config,apiKey:undefined};}if(!this.key)throw fail('请先在 AI 设置中填写 OpenAI API Key，再开始 AI 拆分。',428);return {...this.config,apiKey:this.key};}
 }
 async function readLimited(response,limit=32*1024*1024){
   if(Number(response.headers.get('content-length'))>limit)throw fail('模型响应过大');

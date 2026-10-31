@@ -1,5 +1,14 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-8',version:'0.3.0-beta.8',date:'2026-10-31',title:'UI Studio · 直连本地 Codex',unread:true,
+    summary:'默认复用本机 Codex CLI 登录，直接分析原图、提出拆分和 HTML/CSS 候选，确认后完成透明提取、补绘与结果回传；无需在 UI Studio 填写 API Key。',
+    releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.8',changes:[
+      {type:'new',text:'“交给本地 Codex”直接创建本机任务，显示安装、登录、版本与处理进度；无需手工复制指令，OpenAI API 保留为可选引擎。'},
+      {type:'new',text:'组件候选分析、再次拆分、HTML/CSS 复刻、去字、图标透明提取与遮挡补绘共用本地 Codex 引擎，真实 PNG 回传到 UI Studio。'},
+      {type:'improved',text:'整图拆分也先等待设计师选择并确认，处理后追加素材、创建新版本，按偏好独立保存本地文件夹，保留原素材与历史。'},
+      {type:'fixed',text:'同一组件的相同并发请求共用分析结果；避免多个页面重复触发同一候选任务。失败明确显示登录、网络、图像工具或超时原因。'},
+      {type:'security',text:'通过官方 CLI 复用登录，不读取凭据；临时会话、只读沙箱、无 shell 调用，不交付 PowerShell 启动器，不把账号与用户图片打进工具包。'},
+      {type:'improved',text:'已实际验证本机无 API Key 的图片识别和图像编辑 PNG 回传；连接与透明通道验证不代表复刻质量达标，最终保真程度仍由设计师验收。'}]},
   {id:'ui-studio-0-3-0-beta-7',version:'0.3.0-beta.7',date:'2026-10-31',title:'UI Studio · 修复候选分析反馈',unread:true,
     summary:'修复点击候选方案像没有反应的问题：操作状态、失败原因与下一步入口就在分析按钮下方；区分已保存组件的离线预览与重新调用 AI 分析。',
     releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.7',changes:[
