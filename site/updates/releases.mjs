@@ -1,5 +1,6 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-16',version:'0.3.0-beta.16',date:'2026-11-01',title:'UI Studio · 素材属性默认展开',unread:true,summary:'点开素材详情后，高级素材属性与选区工具默认展开，直接查看和调整适用设置。',releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.16',changes:[{type:'improved',text:'高级素材属性与选区工具默认展开；保留手动收起、历史版本只读及未保存修改限制。'}]},
   {id:'ui-studio-0-3-0-beta-15',version:'0.3.0-beta.15',date:'2026-10-31',title:'UI Studio · 点开素材后操作',unread:true,summary:'点击素材卡片打开详情窗口，在窗口里预览、编辑属性、复制 ID，并选择再次拆分或网页复刻；移除页面常驻操作条。',releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.15',changes:[
     {type:'improved',text:'素材操作改为点击卡片打开详情窗口，集中原图预览、素材/UI/版本任务 ID、属性与下载。'},
     {type:'improved',text:'再次拆分与 HTML5 + CSS 复刻从详情窗口进入对应步骤，切换时关闭详情，避免多层窗口堆叠。'},
