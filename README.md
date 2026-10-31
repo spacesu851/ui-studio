@@ -1,8 +1,8 @@
 # UI Studio 0.3
 
-按用户提供的抖音视频界面和操作流程制作的本地 UI 拆图与素材版本工具。默认地址：**http://127.0.0.1:4763**。
+按用户提供的抖音视频界面和操作流程制作的本地 UI 拆图与素材版本工具。默认地址：**http://127.0.0.1:4763**。标签页标题统一为“UI Studio - 拆分图构建网页”。
 
-**版本下载：[v0.3.0-beta.17 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.17)。默认直连本地 Codex；OpenAI API 作为可选引擎保留。**
+**版本下载：[v0.3.0-beta.18 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.18)。默认直连本地 Codex；OpenAI API 作为可选引擎保留。**
 
 版本号、更新说明和下载入口均随 UI Studio 提供：启动后点击工作台顶部“版本与下载”，或打开 [本机更新页](http://127.0.0.1:4763/updates/)。该页面离线可查看；下载会前往对应 GitHub 发布包。
 
