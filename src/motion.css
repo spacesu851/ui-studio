@@ -15,6 +15,7 @@ input:not([type=checkbox]),textarea,select{transition:border-color var(--motion-
 input:focus-visible,textarea:focus-visible,select:focus-visible{border-color:#a9deeb99;box-shadow:0 0 0 3px #91cfdf16;outline:none}
 .modal-backdrop{animation:studio-scrim-in 140ms ease-out}
 .modal-backdrop>.modal{animation:studio-dialog-in 200ms var(--motion-ease);transform-origin:center}
+.gsap-modal,.gsap-modal>.modal{animation:none}
 .deferred-image[data-loading="ready"]{animation:studio-image-in 180ms ease-out}
 .toast,.review-notice{animation:studio-notice-in 180ms var(--motion-ease)}
 .toast>svg,.review-notice>svg{animation:studio-check-in 220ms var(--motion-ease)}

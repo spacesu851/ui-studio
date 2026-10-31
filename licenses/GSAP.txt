@@ -4,3 +4,8 @@ Distributed under the GSAP Standard License (not MIT).
 License: https://gsap.com/standard-license/
 Source: https://github.com/greensock/GSAP
 The distributed core source retains its original copyright and license notice.
+
+@gsap/react 2.1.2
+Copyright 2025, GreenSock. All rights reserved.
+License: https://gsap.com/standard-license/
+Source: https://github.com/greensock/react

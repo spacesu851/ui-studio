@@ -2,9 +2,13 @@
 
 按用户提供的抖音视频界面和操作流程制作的本地 UI 拆图与素材版本工具。默认地址：**http://127.0.0.1:4763**。
 
-**版本下载：[v0.3.0-beta.13 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.13)。默认直连本地 Codex；OpenAI API 作为可选引擎保留。**
+**版本下载：[v0.3.0-beta.14 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.14)。默认直连本地 Codex；OpenAI API 作为可选引擎保留。**
 
 版本号、更新说明和下载入口均随 UI Studio 提供：启动后点击工作台顶部“版本与下载”，或打开 [本机更新页](http://127.0.0.1:4763/updates/)。该页面离线可查看；下载会前往对应 GitHub 发布包。
+
+## GSAP 动画（0.3.0-beta.14）
+
+按 gsap-react、gsap-timeline 与 gsap-performance skills 实现：官方 `@gsap/react` 的 `useGSAP` 管理作用域、更新清理和卸载；`gsap.timeline` 用 heading/content、scrim/surface 标签衔接页面与弹窗，按可见区域分批入场。React 动画控制器也异步加载，按钮轻量反馈继续使用 CSS。
 
 ## 交互动画（0.3.0-beta.13）
 

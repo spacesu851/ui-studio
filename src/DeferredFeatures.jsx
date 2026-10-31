@@ -1,3 +1,4 @@
+import {MotionBackdrop} from './StudioMotion.jsx';
 import React,{Component,Suspense,lazy,useMemo,useState} from 'react';
 class FeatureError extends Component {
  state={failed:false};
@@ -7,7 +8,7 @@ class FeatureError extends Component {
 function deferred(load,name,{dialog=false}={}){
  return function DeferredFeature(props){
   const [attempt,setAttempt]=useState(0),Loaded=useMemo(()=>lazy(()=>load().then(module=>({default:module[name]}))),[attempt]);
-  const wrap=content=>dialog?<div className="modal-backdrop"><section className="modal" role="dialog" aria-modal="true" aria-label="正在加载功能">{content}</section></div>:content;
+  const wrap=content=>dialog?<MotionBackdrop><section className="modal" role="dialog" aria-modal="true" aria-label="正在加载功能">{content}</section></MotionBackdrop>:content;
   return <FeatureError key={attempt} wrap={wrap} onRetry={()=>setAttempt(v=>v+1)} onClose={props.onClose}><Suspense fallback={wrap(<div className="feature-loading" role="status">正在加载{name==='SettingsDialog'?'处理引擎设置':name==='HtmlComponentDialog'?'组件复刻工具':'页面'}…{props.onClose&&<button className="button" onClick={props.onClose}>取消</button>}</div>)}><Loaded {...props}/></Suspense></FeatureError>;
  }
 }
