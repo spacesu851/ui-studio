@@ -1,0 +1,34 @@
+:root{--motion-fast:130ms;--motion-standard:200ms;--motion-ease:cubic-bezier(.2,.7,.2,1)}
+.button,.icon-button,.text-button,.ui-card,.material-card,.upload-card,.add-material,.project-steps a,.filmstrip button,.review-assets button,.task-select-list button,.tabs button,.component-steps li{transition:background-color var(--motion-fast),border-color var(--motion-fast),color var(--motion-fast),box-shadow var(--motion-standard),translate var(--motion-fast) var(--motion-ease),scale var(--motion-fast) var(--motion-ease)}
+@media(hover:hover) and (pointer:fine){
+ .button:not(:disabled):not([aria-disabled="true"]):hover,.icon-button:not(:disabled):hover{translate:0 -1px;box-shadow:0 4px 14px #030c1526}
+ .ui-card:hover,.material-card:hover,.upload-card:hover,.add-material:hover{translate:0 -2px;border-color:#91cfdf80;box-shadow:0 8px 22px #030c1526}
+ .filmstrip button:not(:disabled):hover,.review-assets button:not(:disabled):hover{border-color:#91cfdf80;background-color:#28435a80}
+ .project-flow-footer .primary:hover>svg{translate:2px 0}
+}
+.button:not(:disabled):not([aria-disabled="true"]):active,.icon-button:not(:disabled):active,.ui-card:active,.material-card:active,.upload-card:active,.filmstrip button:active{scale:.98;translate:0 0;transition-duration:70ms}
+.material-card.selected,.filmstrip button.active,.review-assets button.active{box-shadow:inset 0 0 0 1px #91cfdf50}
+.project-steps a[aria-current="step"],.component-steps li[aria-current="step"]{animation:studio-selected 200ms var(--motion-ease)}
+.project-flow-footer .primary>svg{transition:translate var(--motion-fast) var(--motion-ease)}
+.button:focus-visible,.icon-button:focus-visible,.text-button:focus-visible,.material-card:focus-visible,.ui-card:focus-visible,.project-steps a:focus-visible,.filmstrip button:focus-visible,.review-assets button:focus-visible,summary:focus-visible{outline:2px solid #a9deeb;outline-offset:3px}
+input:not([type=checkbox]),textarea,select{transition:border-color var(--motion-fast),box-shadow var(--motion-fast)}
+input:focus-visible,textarea:focus-visible,select:focus-visible{border-color:#a9deeb99;box-shadow:0 0 0 3px #91cfdf16;outline:none}
+.modal-backdrop{animation:studio-scrim-in 140ms ease-out}
+.modal-backdrop>.modal{animation:studio-dialog-in 200ms var(--motion-ease);transform-origin:center}
+.deferred-image[data-loading="ready"]{animation:studio-image-in 180ms ease-out}
+.toast,.review-notice{animation:studio-notice-in 180ms var(--motion-ease)}
+.toast>svg,.review-notice>svg{animation:studio-check-in 220ms var(--motion-ease)}
+.feature-loading::before{content:"";width:16px;height:16px;border:2px solid #8ac7dc30;border-top-color:#b5e4ed;border-radius:50%;animation:spin 800ms linear infinite;flex-shrink:0}
+.feature-loading:has([role="alert"])::before,[role="alert"].feature-loading::before{display:none}
+.component-feedback.is-processing strong::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#a9deeb;margin-right:8px;animation:studio-working 1000ms ease-in-out infinite}
+@keyframes studio-scrim-in{from{opacity:0}to{opacity:1}}
+@keyframes studio-dialog-in{from{opacity:0;translate:0 10px;scale:.985}to{opacity:1;translate:0 0;scale:1}}
+@keyframes studio-image-in{from{opacity:0}to{opacity:1}}
+@keyframes studio-notice-in{from{opacity:0;translate:0 -7px}to{opacity:1;translate:0 0}}
+@keyframes studio-check-in{from{opacity:.4;scale:.8}to{opacity:1;scale:1}}
+@keyframes studio-selected{from{background-color:#81c5d926}to{background-color:revert-layer}}
+@keyframes studio-working{50%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){
+ .button,.icon-button,.text-button,.ui-card,.material-card,.upload-card,.add-material,.project-steps a,.filmstrip button,.review-assets button,.task-select-list button,.tabs button,.component-steps li,input,textarea,select,.project-flow-footer .primary>svg{transition:none!important;translate:none!important;scale:none!important}
+ .modal-backdrop,.modal-backdrop>.modal,.deferred-image,.toast,.toast>svg,.review-notice,.review-notice>svg,.feature-loading::before,.component-feedback.is-processing strong::before,.spin,.component-steps li,.project-steps a{animation:none!important}
+}

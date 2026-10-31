@@ -1,5 +1,9 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-13',version:'0.3.0-beta.13',date:'2026-10-31',title:'UI Studio · 交互动画与状态反馈',unread:true,summary:'为步骤切换、复刻向导、弹窗和素材操作加入短暂的交互动画，保持现有懒加载、任务 ID 与操作响应。',releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.13',changes:[
+    {type:'improved',text:'阶段前进/后退与复刻向导分页使用方向过渡，弹窗淡入与轻微缩放；快速切换自动清理旧动画，不等待动画才执行操作。'},
+    {type:'improved',text:'按钮悬停、按下与键盘焦点，素材卡片悬停/选中、图片加载与完成提示有明确反馈；禁用按钮不显示可点击动效。'},
+    {type:'improved',text:'GSAP 动画引擎独立异步加载；系统减少动态效果时停用位移和循环动画，不影响原图、验收 iframe 和导出的网页组件。'}]},
   {id:'ui-studio-0-3-0-beta-12',version:'0.3.0-beta.12',date:'2026-10-31',title:'UI Studio · 素材与功能按需加载',unread:true,summary:'项目缩略图、素材列表、同合集预览与拆分结果按可见区域加载；组件复刻、验收、引擎设置和更新页面按需加载独立代码包。',releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.12',changes:[
     {type:'improved',text:'素材图片进入可视区域后才请求，兼容页面、横向缩略图和独立滚动容器；保留原有占位尺寸，异步解码，卸载时释放观察。'},
     {type:'improved',text:'复刻弹窗、验收页、处理引擎设置与更新页改为按需下载代码和样式；显示加载反馈，失败可重试，不清空当前编辑。'},
