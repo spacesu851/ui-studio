@@ -1,4 +1,5 @@
 import express from 'express';
+import {ComponentReviews} from './component-reviews.mjs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {readFile} from 'node:fs/promises';
@@ -20,6 +21,7 @@ export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(r
   const info=releaseInfo(JSON.parse(await readFile(path.join(root,'package.json'),'utf8')).version);
   const store=await new Store(dataDir).init(),app=express();
   const local=new LocalExports(store,exportRoot,openDirectory);
+  const reviews=new ComponentReviews(store);
   const aiSettings=new AiSettings(store.db,aiEnvironment),aiJobs=new AiJobs(store,aiSettings,local,{providerFactory:aiProviderFactory});
   async function finishVersion(m){if(m.elements.length&&m.processing?.saveLocal)await local.create(m,{open:m.processing.openLocal});return m;}
   app.disable('x-powered-by');
@@ -49,6 +51,8 @@ export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(r
   app.post('/api/ai/jobs/:job/approve',(req,res)=>res.status(202).json(aiJobs.approve(req.params.job,req.body)));
   app.post('/api/ai/jobs/:job/resume',(req,res)=>res.status(202).json(aiJobs.resume(req.params.job)));
   app.get('/api/connection',(req,res)=>res.json({projectPath:root,cliPath:path.join(root,'bridge','cli.mjs'),mcpPath:path.join(root,'bridge','mcp.mjs'),nodePath:process.execPath,exportRoot:local.root}));
+  app.get('/api/ui/:id/reviews',(req,res)=>res.json(reviews.report(req.params.id,req.query.version)));
+  app.post('/api/ui/:id/reviews',async(req,res)=>{const report=reviews.save(req.params.id,req.body),m=store.version(req.params.id);const localExport=m.processing?.saveLocal?await local.create(m,{open:false}):undefined;res.status(201).json({report,localExport});});
   app.get('/api/folders',(req,res)=>res.json(store.folders()));
   app.post('/api/folders',(req,res)=>res.status(201).json(store.createFolder(req.body.title)));
   app.get('/api/folders/:id',(req,res)=>res.json({folder:store.folders().find(f=>f.id===req.params.id),items:store.list(req.params.id)}));
@@ -65,7 +69,7 @@ export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(r
   app.post('/api/ui/:id/detect',async(req,res)=>{const m=store.version(req.params.id,req.body.version);res.json({elements:await detect(await readFile(store.file(m.original)),Number(req.body.sensitivity)||35),method:'轮廓检测，复杂背景建议交给 Codex 处理'});});
   app.post('/api/ui/:id/preview',async(req,res)=>{const m=store.version(req.params.id,req.body.version),[e]=validateElements([req.body.element],m.width,m.height);res.type('png').send(await extract(await readFile(store.file(m.original)),e.rect,e.removeBackground,e.tolerance));});
   app.get('/api/ui/:id/export',async(req,res)=>{const m=store.version(req.params.id,req.query.version),inspection=await inspectMaterials(m,url=>store.file(url));res.attachment(`${m.id}-v${m.version}.zip`);const zip=archiver('zip',{zlib:{level:6}});zip.on('error',e=>res.destroy(e));zip.pipe(res);
-    const elements=m.elements.map((e,i)=>({...e,...inspection[i],file:`assets/${e.id}.png`}));zip.append(JSON.stringify({...m,originalFile:'original.png',elements},null,2),{name:'manifest.json'});zip.append(JSON.stringify({processing:m.processing,processingReport:m.processingReport,assets:elements},null,2),{name:'catalog.json'});zip.file(store.file(m.original),{name:'original.png'});for(const e of elements){zip.file(store.file(e.url),{name:e.file});for(const f of e.htmlComponent?await componentFiles(store,e):await buttonFiles(store,e)){const name=`${e.htmlComponent?'html-components':'html-buttons'}/${e.id}/${f.name}`;if(f.file)zip.file(f.file,{name});else zip.append(f.data,{name})}}
+    const elements=m.elements.map((e,i)=>({...e,...inspection[i],file:`assets/${e.id}.png`}));zip.append(JSON.stringify(reviews.report(m.id,m.version),null,2),{name:'review-report.json'});zip.append(JSON.stringify({...m,originalFile:'original.png',elements},null,2),{name:'manifest.json'});zip.append(JSON.stringify({processing:m.processing,processingReport:m.processingReport,assets:elements},null,2),{name:'catalog.json'});zip.file(store.file(m.original),{name:'original.png'});for(const e of elements){zip.file(store.file(e.url),{name:e.file});for(const f of e.htmlComponent?await componentFiles(store,e):await buttonFiles(store,e)){const name=`${e.htmlComponent?'html-components':'html-buttons'}/${e.id}/${f.name}`;if(f.file)zip.file(f.file,{name});else zip.append(f.data,{name})}}
     zip.append(`# ${m.title}\n\nUI ID: ${m.id}\nVersion: ${m.version}\n\n素材命名、原图坐标和本地文件位置见 manifest.json。catalog.json 含真实 Alpha 检查与补绘／提取方式。背景层可不透明；补绘是生成还原，不等于原始 PSD 分层。\n`,{name:'README.md'});zip.finalize();});
   app.use('/media',(req,res,next)=>{if(!/^\/UI-[a-f0-9]{8}\/v\d+-[a-f0-9]{10}\/(?:original|EL-[a-f0-9]{8})\.png$/.test(req.path))return res.status(404).end();next();},express.static(store.root,{index:false,immutable:true,maxAge:'1y',dotfiles:'deny'}));
   // Never expose the database or other data files through the media route.

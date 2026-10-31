@@ -11,3 +11,4 @@ data/
 *.db
 *.zip
 *.ps1
+/design-qa.md

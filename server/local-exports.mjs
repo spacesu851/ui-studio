@@ -5,6 +5,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 import {inspectMaterials} from './materials.mjs';
 import {buttonFiles} from './html-buttons.mjs';
+import {savedReviewReport} from './component-reviews.mjs';
 import {componentFiles} from './html-components.mjs';
 const xml=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const safe=s=>String(s).replace(/[\x00-\x1f<>:"/\\|?*]/g,'_').replace(/[ .]+$/g,'').slice(0,80)||'素材';
@@ -20,6 +21,7 @@ export class LocalExports {
       for(const [i,e] of manifest.elements.entries()){const filename=`assets/${String(i+1).padStart(2,'0')}_${safe(e.name)}__${e.id}.png`;await writeFile(path.join(partial,filename),await readFile(this.store.file(e.url)));const files=e.htmlComponent?await componentFiles(this.store,e):await buttonFiles(this.store,e);const codeRoot=e.htmlComponent?'html-components':'html-buttons';if(files.length){const codeFolder=path.join(partial,codeRoot,e.id);await mkdir(codeFolder,{recursive:true});for(const f of files){await mkdir(path.dirname(path.join(codeFolder,f.name)),{recursive:true});await writeFile(path.join(codeFolder,f.name),f.file?await readFile(f.file):f.data);}}exported.push({...e,...inspection[i],file:filename,...(files.length?{htmlDirectory:`${codeRoot}/${e.id}`}:{})});}
       const localManifest={...manifest,originalFile:'original.png',elements:exported};await writeFile(path.join(partial,'manifest.json'),JSON.stringify(localManifest,null,2));await writeFile(path.join(partial,'catalog.json'),JSON.stringify({ui:manifest.id,version:manifest.version,processing:manifest.processing||this.store.preferences(manifest.id),processingReport:manifest.processingReport||{inpainting:'unverified',notes:'旧版本没有单独登记补绘状态'},assets:exported},null,2));
       await writeFile(path.join(partial,'README.md'),`# ${manifest.title}\n\nUI ID: ${manifest.id}\n版本: v${manifest.version}\n独立素材: ${exported.length}\n\nassets/ 保存独立 PNG，original.png 为原图；manifest.json 包含原图坐标和本地文件名，catalog.json 包含真实 Alpha 检查和处理方式，preview.png 为棋盘底预览。\n\n背景允许不透明；组件应有实际透明像素。AI 补绘应单独标记，不能当成源 PSD 原始图层。unknown 或 unverified 表示未提供处理证明，不表示完成了 AI 补绘。\n\n${manifest.note}\n`);
+      await writeFile(path.join(partial,'review-report.json'),JSON.stringify(savedReviewReport(this.store,manifest.id,manifest.version),null,2));
       await this.preview(exported,partial);await rename(partial,folder);item.directory=folder;item.assetDirectory=path.join(folder,'assets');item.assetCount=exported.length;item.status='saved';
       if(open){try{await this.openPath(folder);item.opened=true}catch(e){item.openError=e.message}}
     }catch(e){item.status='failed';item.error=e.message;if(partial)item.partialDirectory=partial;}return this.record(item);

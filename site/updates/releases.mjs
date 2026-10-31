@@ -1,5 +1,14 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-6',version:'0.3.0-beta.6',date:'2026-10-31',title:'UI Studio · 组件对照与设计师验收',unread:true,
+    summary:'把原图对照、网页试用、文字编辑、状态预览、设计师结论和本地交付集中到复刻验收页。已保存的组件无需 API 即可预览验收；独立 AI 识别与补绘仍使用接收者自己的模型设置。',
+    releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.6',changes:[
+      {type:'new',text:'工作台加入“复刻验收”入口，按组件切换原图/HTML 对照，支持 1×/2× 和透明棋盘、深色、浅色衬底。'},
+      {type:'new',text:'文字可以直接修改并保存为新版本，输入栏可直接输入；按钮可切换实际操作、默认、移入、按下、焦点与禁用状态。静态组件由设计师勾选后才试验按钮交互。'},
+      {type:'new',text:'记录通过、需要调整和待验收结论及意见。新组件和新版本保持待验收，不自动代替设计师通过；已保存历史结论保留。'},
+      {type:'improved',text:'验收意见随独立本地目录和完整素材 ZIP 的 review-report.json 交付，支持打开目录、独立 HTML、组件工程包和全部素材。'},
+      {type:'fixed',text:'输入框焦点反馈沿用组件边框色，支持焦点预览和整体禁用显示；未保存修改不允许误验收。'}]},
+
   {id:'ui-studio-0-3-0-beta-5',version:'0.3.0-beta.5',date:'2026-10-31',title:'UI Studio · 设计师确认与交互组件复刻',unread:true,
     summary:'复刻不限于按钮：自动识别或手动选择面板、卡片、标签、文字、图标、输入框、进度条等。尽量用 CSS 绘制，复杂图形使用去字图片底图；所有识别文字作为独立可编辑代码。真实模型还原质量尚未验收。',
     releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.5',changes:[
