@@ -2,9 +2,22 @@
 
 按用户提供的抖音视频界面和操作流程制作的本地 UI 拆图与素材版本工具。默认地址：**http://127.0.0.1:4763**。
 
-**独立 AI 版本下载：[v0.3.0-beta.3 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.3)。旧 v0.2.0 只有管理与桥接功能，不包含独立 AI 引擎。**
+**独立 AI 版本下载：[v0.3.0-beta.4 工具包](https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.4)。旧 v0.2.0 只有管理与桥接功能，不包含独立 AI 引擎。**
 
 版本号、更新说明和下载入口均随 UI Studio 提供：启动后点击工作台顶部“版本与下载”，或打开 [本机更新页](http://127.0.0.1:4763/updates/)。该页面离线可查看；下载会前往对应 GitHub 发布包。
+
+## 按原图复刻 HTML5 + CSS 按钮（0.3.0-beta.4）
+
+选中已保存的素材，在「素材属性」点击「复刻 HTML5 + CSS 按钮」。只处理选中 PNG，原图与可点击 HTML 并排对照。
+
+- **原图贴图**：无需 API，保留 PNG 的纹理、复杂装饰与固有文字；输出原生 HTML button + CSS + PNG，不声称为纯 CSS 绘图。无障碍名称不会修改图片中字样。
+- **CSS 复刻**：使用现有视觉模型分析该图的渐变、位置、圆角、描边、高光、阴影、文字与图标，生成 HTML/CSS；支持修改文字、尺寸、字号、颜色及完整样式 JSON。不同源图生成不同参数，不使用通用模板。复杂纹理和字体可能不一致，需对照检查。未配置 API 时可复制 Codex 指令并导入样式 JSON。
+- 可悬停、按下、键盘聚焦或切换禁用状态。业务点击事件由使用方项目绑定。
+- 复制 HTML / CSS，或下载内嵌图片的独立 HTML。保存会新增版本，保留原始 PNG；本地保存和素材 ZIP 包含 `html-buttons/EL-ID/` 下的 index.html、button.html、button.css、button.json、source.png、README.txt。原图模式集成片段时必须同时复制 source.png；独立 index.html 则可离线使用。
+- 模型返回受限结构化参数，服务端校验后生成代码，预览在无脚本权限的 iframe 中运行；不接收任意脚本或外部资源 URL。配置保存在素材 htmlButton 字段，恢复版本及 CLI/MCP 导入均保留。
+- API：`POST /api/ui/:id/html-button/analyze` 使用 expectedVersion、targetId；只分析不保存。`GET /api/ui/:id/html-button/:element/export?version=N` 下载已保存代码工程。
+
+自动测试与浏览器流程使用模拟视觉结果验证，真实 API 复刻质量尚未验收。贴图方案与 CSS 绘制方案明确分开标记。
 
 ## 内置版本与下载（0.3.0-beta.3）
 

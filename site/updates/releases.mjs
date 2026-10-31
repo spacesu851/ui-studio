@@ -1,5 +1,14 @@
 export const changelogCategories=[{id:'new',label:'新增',color:'#1e9e61'},{id:'improved',label:'改进',color:'#2f6bff'},{id:'fixed',label:'修复',color:'#e8792b'},{id:'security',label:'安全',color:'#d93f5c'}];
 export const changelogReleases=[
+  {id:'ui-studio-0-3-0-beta-4',version:'0.3.0-beta.4',date:'2026-10-31',title:'UI Studio · 按原图复刻 HTML5 + CSS 按钮',unread:true,
+    summary:'在素材属性中把选中的按钮复刻为 HTML5 + CSS。提供原图对照、原图贴图与 CSS 绘制两种方式，可调整文字、尺寸和样式参数，并保存版本与本地代码。CSS 识别按原图分析，不套用通用模板；真实模型复刻质量尚未验收。',
+    releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.4',
+    changes:[
+      {type:'new',text:'“再次拆分组件”旁增加“复刻 HTML5 + CSS 按钮”，支持原图与可点击 HTML 对照预览、复制 HTML/CSS 和下载独立 HTML。'},
+      {type:'new',text:'保留原图纹理和字样的贴图按钮无需 API；CSS 复刻识别原图渐变、边框、高光、阴影、字样与图标，并可修改文字、尺寸及样式 JSON。'},
+      {type:'improved',text:'保存时新增不可变版本，原始 PNG 保留；本地导出及 ZIP 同时包含 HTML、CSS、样式 JSON、原图与使用说明。'},
+      {type:'new',text:'提供禁用状态、鼠标悬停与按下、键盘焦点；支持复制 Codex 按原图复刻指令和手动导入样式。'},
+      {type:'security',text:'模型仅返回结构化样式参数，拒绝脚本和外部资源；预览使用隔离 iframe，文字按 HTML 转义。'}]},
   {id:'ui-studio-0-3-0-beta-3',version:'0.3.0-beta.3',date:'2026-10-30',title:'UI Studio · 内置版本说明与下载页',unread:true,
     summary:'版本说明和下载入口纳入 UI Studio，随工具包一起交付。在本地查看当前安装版本、具体更新内容和对应下载，不再依赖线上说明页。',
     releaseUrl:'https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.3',

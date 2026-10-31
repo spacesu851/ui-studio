@@ -10,6 +10,8 @@ import {inspectMaterials} from './materials.mjs';
 import {AiSettings,OpenAiProvider} from './ai-provider.mjs';
 import {AiJobs} from './ai-jobs.mjs';
 import {releaseInfo} from '../shared/releases.mjs';
+import {analyzeButton,getButtonSource,buttonFiles} from './html-buttons.mjs';
+import {safeError} from './ai-provider.mjs';
 const here=path.dirname(fileURLToPath(import.meta.url)),root=path.dirname(here);
 export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(root,'data'),exportRoot=process.env.UI_STUDIO_EXPORT_ROOT||path.join(root,'../ui-studio-exports'),openDirectory,production=false,aiEnvironment=process.env,aiProviderFactory=config=>new OpenAiProvider(config)}={}){
   const info=releaseInfo(JSON.parse(await readFile(path.join(root,'package.json'),'utf8')).version);
@@ -24,6 +26,9 @@ export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(r
   app.use('/api',express.json({limit:'32mb'}));
   app.get('/api/health',(req,res)=>res.json({ok:true,engine:'独立 AI 识别 + 透明提取 + 补绘 + 视觉质检',storage:'local',bridgeVersion:'3',aiConfigured:aiSettings.public().configured}));
   app.get('/api/release',(req,res)=>res.json(info));
+  let buttonAnalysisRunning=false;
+  app.post('/api/ui/:id/html-button/analyze',async(req,res)=>{const {manifest,asset}=getButtonSource(store,req.params.id,undefined,req.body.targetId);if(req.body.expectedVersion!==manifest.version)throw Object.assign(Error('版本已变化，请先同步'),{status:409});if(buttonAnalysisRunning)throw Object.assign(Error('已有按钮样式分析进行中，请等待完成'),{status:409});const config=aiSettings.snapshot();buttonAnalysisRunning=true;try{const result=await analyzeButton(aiProviderFactory(config),await readFile(store.file(asset.url)),asset);res.json({recipe:result,sourceVersion:manifest.version,targetId:asset.id});}catch(e){throw Object.assign(Error(safeError(e,config.apiKey)),{status:e.status||400});}finally{buttonAnalysisRunning=false}});
+  app.get('/api/ui/:id/html-button/:element/export',async(req,res)=>{const {asset,manifest}=getButtonSource(store,req.params.id,req.query.version,req.params.element);if(!asset.htmlButton)throw Error('当前素材尚未保存 HTML 按钮');res.attachment(`${manifest.id}-${asset.id}-html-button.zip`);const zip=archiver('zip',{zlib:{level:6}});zip.on('error',e=>res.destroy(e));zip.pipe(res);for(const f of await buttonFiles(store,asset)){if(f.file)zip.file(f.file,{name:f.name});else zip.append(f.data,{name:f.name})}zip.finalize()});
   app.get('/api/ai/settings',(req,res)=>res.json(aiSettings.public()));
   app.post('/api/ai/settings',(req,res)=>res.json(aiSettings.update(req.body)));
   app.post('/api/ai/test',async(req,res)=>res.json(await aiProviderFactory(aiSettings.snapshot()).test()));
@@ -50,7 +55,7 @@ export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(r
   app.post('/api/ui/:id/detect',async(req,res)=>{const m=store.version(req.params.id,req.body.version);res.json({elements:await detect(await readFile(store.file(m.original)),Number(req.body.sensitivity)||35),method:'轮廓检测，复杂背景建议交给 Codex 处理'});});
   app.post('/api/ui/:id/preview',async(req,res)=>{const m=store.version(req.params.id,req.body.version),[e]=validateElements([req.body.element],m.width,m.height);res.type('png').send(await extract(await readFile(store.file(m.original)),e.rect,e.removeBackground,e.tolerance));});
   app.get('/api/ui/:id/export',async(req,res)=>{const m=store.version(req.params.id,req.query.version),inspection=await inspectMaterials(m,url=>store.file(url));res.attachment(`${m.id}-v${m.version}.zip`);const zip=archiver('zip',{zlib:{level:6}});zip.on('error',e=>res.destroy(e));zip.pipe(res);
-    const elements=m.elements.map((e,i)=>({...e,...inspection[i],file:`assets/${e.id}.png`}));zip.append(JSON.stringify({...m,originalFile:'original.png',elements},null,2),{name:'manifest.json'});zip.append(JSON.stringify({processing:m.processing,processingReport:m.processingReport,assets:elements},null,2),{name:'catalog.json'});zip.file(store.file(m.original),{name:'original.png'});for(const e of elements)zip.file(store.file(e.url),{name:e.file});
+    const elements=m.elements.map((e,i)=>({...e,...inspection[i],file:`assets/${e.id}.png`}));zip.append(JSON.stringify({...m,originalFile:'original.png',elements},null,2),{name:'manifest.json'});zip.append(JSON.stringify({processing:m.processing,processingReport:m.processingReport,assets:elements},null,2),{name:'catalog.json'});zip.file(store.file(m.original),{name:'original.png'});for(const e of elements){zip.file(store.file(e.url),{name:e.file});for(const f of await buttonFiles(store,e)){const name=`html-buttons/${e.id}/${f.name}`;if(f.file)zip.file(f.file,{name});else zip.append(f.data,{name})}}
     zip.append(`# ${m.title}\n\nUI ID: ${m.id}\nVersion: ${m.version}\n\n素材命名、原图坐标和本地文件位置见 manifest.json。catalog.json 含真实 Alpha 检查与补绘／提取方式。背景层可不透明；补绘是生成还原，不等于原始 PSD 分层。\n`,{name:'README.md'});zip.finalize();});
   app.use('/media',(req,res,next)=>{if(!/^\/UI-[a-f0-9]{8}\/v\d+-[a-f0-9]{10}\/(?:original|EL-[a-f0-9]{8})\.png$/.test(req.path))return res.status(404).end();next();},express.static(store.root,{index:false,immutable:true,maxAge:'1y',dotfiles:'deny'}));
   // Never expose the database or other data files through the media route.
