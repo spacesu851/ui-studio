@@ -2,7 +2,7 @@ import {LocalCodexRunner,LocalCodexProvider} from './local-codex.mjs';
 import {isLocalComponentPlan} from '../shared/component-mode.mjs';
 import express from 'express';
 import {ComponentReviews} from './component-reviews.mjs';
-import {legacyReviewUrl} from '../shared/workflow.mjs';
+import {legacyReviewUrl,legacyPrepareUrl} from '../shared/workflow.mjs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {readFile} from 'node:fs/promises';
@@ -97,7 +97,7 @@ export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(r
   app.use('/media',(req,res,next)=>{if(!/^\/UI-[a-f0-9]{8}\/v\d+-[a-f0-9]{10}\/(?:original|EL-[a-f0-9]{8})\.png$/.test(req.path))return res.status(404).end();next();},express.static(store.root,{index:false,immutable:true,maxAge:'1y',dotfiles:'deny'}));
   // Never expose the database or other data files through the media route.
   app.use('/api',(req,res)=>res.status(404).json({error:'接口不存在'}));
-  app.get('/ui/:id',(req,res,next)=>{if(!/^UI-[a-f0-9]{8}$/.test(req.params.id))return next();res.setHeader('Link',`</api/ui/${req.params.id}>; rel="describedby"; type="application/json"`);if(req.headers.accept?.includes('application/json'))return res.json(store.version(req.params.id,req.query.version));next();});
+  app.get('/ui/:id',(req,res,next)=>{if(!/^UI-[a-f0-9]{8}$/.test(req.params.id))return next();res.setHeader('Link',`</api/ui/${req.params.id}>; rel="describedby"; type="application/json"`);if(req.headers.accept?.includes('application/json'))return res.json(store.version(req.params.id,req.query.version));const legacy=legacyPrepareUrl(req.path,new URL(req.originalUrl,'http://localhost').search);if(legacy)return res.redirect(302,legacy);next();});
   app.get(/^\/review\/UI-[a-f0-9]{8}\/?$/,(req,res)=>res.redirect(302,legacyReviewUrl(req.path,new URL(req.originalUrl,'http://localhost').search)));
   if(production){app.use(express.static(path.join(root,'dist')));app.get('/{*splat}',(req,res)=>res.sendFile(path.join(root,'dist','index.html')));}
   else{const {createServer}=await import('vite');const vite=await createServer({root,server:{middlewareMode:true,hmr:false},appType:'spa'});app.use(vite.middlewares);app.locals.vite=vite;}
