@@ -2,6 +2,7 @@ import {LocalCodexRunner,LocalCodexProvider} from './local-codex.mjs';
 import {isLocalComponentPlan} from '../shared/component-mode.mjs';
 import express from 'express';
 import {ComponentReviews} from './component-reviews.mjs';
+import {legacyReviewUrl} from '../shared/workflow.mjs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {readFile} from 'node:fs/promises';
@@ -97,6 +98,7 @@ export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(r
   // Never expose the database or other data files through the media route.
   app.use('/api',(req,res)=>res.status(404).json({error:'接口不存在'}));
   app.get('/ui/:id',(req,res,next)=>{if(!/^UI-[a-f0-9]{8}$/.test(req.params.id))return next();res.setHeader('Link',`</api/ui/${req.params.id}>; rel="describedby"; type="application/json"`);if(req.headers.accept?.includes('application/json'))return res.json(store.version(req.params.id,req.query.version));next();});
+  app.get(/^\/review\/UI-[a-f0-9]{8}\/?$/,(req,res)=>res.redirect(302,legacyReviewUrl(req.path,new URL(req.originalUrl,'http://localhost').search)));
   if(production){app.use(express.static(path.join(root,'dist')));app.get('/{*splat}',(req,res)=>res.sendFile(path.join(root,'dist','index.html')));}
   else{const {createServer}=await import('vite');const vite=await createServer({root,server:{middlewareMode:true,hmr:false},appType:'spa'});app.use(vite.middlewares);app.locals.vite=vite;}
   app.use((e,req,res,next)=>{console.error(e.message);res.status(e.status||400).json({error:e.type==='entity.too.large'?'文件过大，最多 20 MB':e.message||'操作失败'});});app.locals.store=store;app.locals.localExports=local;app.locals.aiJobs=aiJobs;app.locals.aiSettings=aiSettings;app.locals.codexRunner=codex;return app;

@@ -14,7 +14,7 @@ function deferred(load,name,{dialog=false}={}){
 }
 export const SettingsDialog=deferred(()=>import('./EngineSettings.jsx'),'SettingsDialog',{dialog:true});
 export const HtmlComponentDialog=deferred(()=>import('./HtmlComponentDialog.jsx'),'HtmlComponentDialog',{dialog:true});
-export const ReviewPage=deferred(()=>import('./ReviewPage.jsx'),'ReviewPage');
+export const ReviewStage=deferred(()=>import('./ReviewPage.jsx'),'ReviewStage');
 export const UpdatesPage=deferred(()=>import('./UpdatesPage.jsx'),'UpdatesPage');
 
 export const AssetDetailsDialog=deferred(()=>import('./AssetDetailsDialog.jsx'),'AssetDetailsDialog',{dialog:true});
