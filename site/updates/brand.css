@@ -1,0 +1,14 @@
+/* Standalone download page shares the locally bundled Studio brand. */
+.studio-shell{color:var(--ink)}
+html[data-theme] .studio-shell .updates-current{background:var(--glass);border-color:var(--line);box-shadow:var(--edge)}
+html[data-theme] .studio-shell .updates-header nav,html[data-theme] .studio-shell .updates-heading p,html[data-theme] .studio-shell .updates-current p,html[data-theme] .studio-shell .updates-heading>span,html[data-theme] .studio-shell .updates-footer{color:var(--muted)}
+html[data-theme] .studio-shell .updates-header button{border-color:var(--line);color:var(--ink)}
+html[data-theme] .studio-shell .updates-beta{color:var(--accent-soft);background:var(--accent-wash)}
+html[data-theme] .studio-shell .updates-download{color:#14243c;background:var(--silver);border-color:#d8e7ff;transition:translate 150ms ease,box-shadow 150ms ease}
+html[data-theme] .studio-shell .release-board{background:var(--panel);border-color:var(--line)}
+html[data-theme] .studio-shell .release-board .su-cl__footer a{color:var(--accent-soft)}
+html[data-theme] .studio-shell .su-changelog[data-theme=dark]{--cl-bg:#10141c;--cl-paper:#181e28;--cl-border:#b9cced20;--cl-ink:#edf3fc;--cl-muted:#929dac}
+html[data-theme=light] .studio-shell{--bg:#edf1f8;--panel:#f9fbff;--ink:#17243a;--muted:#5d6f89;--line:#577ca72e;--accent-soft:#2c64cc;--accent-wash:#397bff10;--glass:linear-gradient(145deg,#fff,#f0f5ff);--edge:inset 0 1px #fff}
+.os-theme-updates{--os-handle-bg:#90b3ec38;--os-handle-bg-hover:#98bfff6e;--os-handle-bg-active:#b8d5ff99}
+@media(hover:hover) and (pointer:fine){html[data-theme] .studio-shell .updates-download:hover{translate:0 -1px;box-shadow:0 5px 20px #397bff26}}
+@media(prefers-reduced-motion:reduce){html[data-theme] .studio-shell .updates-download{translate:none;transition:none}}

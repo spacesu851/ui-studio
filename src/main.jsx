@@ -8,6 +8,7 @@ import 'overlayscrollbars/overlayscrollbars.css';
 import '@fontsource-variable/noto-sans-sc';
 import './style.css';
 import './motion.css';
+import {StudioShell} from './StudioShell.jsx';
 import {StudioMotion,MotionBackdrop} from './StudioMotion.jsx';
 import {DEFAULT_PROCESSING,splitInstructions,materialRole} from '../shared/processing.mjs';
 import {ProcessingPanel,LocalPanel,roleLabels,methodLabels} from './ProcessingPanel.jsx';
@@ -105,4 +106,4 @@ function App(){
   </>;
 }
 function Thumb({e,m}){if(e.url)return <LazyImage src={e.url} alt={e.name}/>;const r=e.rect;return <div className="crop-thumb" style={{aspectRatio:`${r.width}/${r.height}`}}><LazyImage src={m.original} alt={e.name} style={{width:`${m.width/r.width*100}%`,maxWidth:'none',height:'auto',position:'absolute',left:`${-r.x/r.width*100}%`,top:`${-r.y/r.height*100}%`}}/></div>}
-createRoot(document.getElementById('root')).render(/^\/review\/UI-[a-f0-9]{8}\/?$/.test(location.pathname)?<ReviewPage/>:/^\/updates\/?$/.test(location.pathname)?<UpdatesPage/>:<App/>);
+createRoot(document.getElementById('root')).render(<StudioShell>{/^\/review\/UI-[a-f0-9]{8}\/?$/.test(location.pathname)?<ReviewPage/>:/^\/updates\/?$/.test(location.pathname)?<UpdatesPage/>:<App/>}</StudioShell>);

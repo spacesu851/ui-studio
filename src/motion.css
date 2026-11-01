@@ -27,7 +27,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{border-color:#a9
 @keyframes studio-image-in{from{opacity:0}to{opacity:1}}
 @keyframes studio-notice-in{from{opacity:0;translate:0 -7px}to{opacity:1;translate:0 0}}
 @keyframes studio-check-in{from{opacity:.4;scale:.8}to{opacity:1;scale:1}}
-@keyframes studio-selected{from{background-color:#81c5d926}to{background-color:revert-layer}}
+@keyframes studio-selected{from{background-color:#397bff26}to{background-color:revert-layer}}
 @keyframes studio-working{50%{opacity:.35}}
 @media(prefers-reduced-motion:reduce){
  .button,.icon-button,.text-button,.ui-card,.material-card,.upload-card,.add-material,.project-steps a,.filmstrip button,.review-assets button,.task-select-list button,.tabs button,.component-steps li,input,textarea,select,.project-flow-footer .primary>svg{transition:none!important;translate:none!important;scale:none!important}
