@@ -1,6 +1,6 @@
 # UI Studio
 
-本地 UI 图片拆分与素材工作台。当前版本 **0.3.0-beta.23**，默认直连本机已登录的 Codex CLI。
+本地 UI 图片拆分与素材工作台。当前版本 **0.3.0-beta.24**，默认直连本机已登录的 Codex CLI。
 
 ## 启动
 
@@ -20,7 +20,7 @@ npm start
 2. 点击“拆分素材”打开弹窗，勾选去背景、透明 PNG、遮挡补绘三项要求后开始。
 3. 本地 Codex 接收整图、ID 和要求，在一个任务中自主判断组件范围，调用真实图像工具拆分、补绘并整理回传。程序不按视觉分数、透明比例或白边判定拦截结果，不再固定 24 项逐项质检重试。
 4. 回传结果自动新增版本，回到素材工作台。设计师查看是否满意，程序只显示 Alpha、尺寸和来源等事实，不把生成完成当作人工验收。
-5. 不满意的素材可复制 UI ID、EL 素材 ID 或 SPLIT 任务 ID，连同修改意见再次交给 Codex；素材详情和任务区提供“复制给 Codex”入口。修正时保留其他素材与历史，以新版本回传。
+5. 不满意的素材可复制 UI ID、EL 素材 ID 或 SPLIT 任务 ID，连同修改意见再次交给 Codex；素材详情提供“复制给 Codex 修改”入口。修正时保留其他素材与历史，以新版本回传。
 
 点击素材仍打开原有详情，可继续细分、复刻 HTML5/CSS 或下载。版本历史保留在素材面板，“项目信息与高级联动”提供本地保存和打开目录。移除四步导航及底部上一步/下一步；旧步骤链接兼容进入 /ui/UI-ID?stage=components 工作台。
 
@@ -28,7 +28,7 @@ npm start
 
 ## 结果与中断
 
-生成图像保留来源、实际 Alpha 和“待设计师检查”状态。连接、额度、文件格式等技术错误会说明具体原因；已有候选仍可预览，并可由设计师选择保存。程序不会把没有返回的图片伪装为完成。不会用轮廓矩形冒充语义拆分。
+生成图像保留来源、实际 Alpha 和“待设计师检查”状态。连接、额度、文件格式等技术错误会说明具体原因；已有文件与任务 ID 保留，可交给 Codex 继续处理。程序不会把没有返回的图片伪装为完成。不会用轮廓矩形冒充语义拆分。
 
 任务与图像落在本地 data/，每次保存产生不可变版本和独立导出目录。更新要求 expectedVersion；旧任务已发布后不复用其 ID 绑定第二个结果，修正任务有新 ID。源码和发布 ZIP 不包含 data/、用户图片、导出目录、node_modules 或凭据。
 
@@ -86,8 +86,8 @@ bridge/mcp.mjs 提供 get_ui、get_ui_group、get_ui_history、pull_ui、publish
 本地 /updates/ 随工具提供版本说明及下载。
 
 - 源码：https://github.com/spacesu851/ui-studio
-- 发布：https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.23
-- 工具包：https://github.com/spacesu851/ui-studio/releases/download/v0.3.0-beta.23/ui-studio-v0.3.0-beta.23.zip
+- 发布：https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.24
+- 工具包：https://github.com/spacesu851/ui-studio/releases/download/v0.3.0-beta.24/ui-studio-v0.3.0-beta.24.zip
 
 分发给别人后，对方使用自己的本机 Codex 登录；OpenAI API 仍作为显式可选兼容引擎，密钥只放本机服务内存或环境变量。字体、Logo 与 favicon 本地打包；保留 OverlayScrollbars 和按需加载的 GSAP 微交互，减少动态效果时停用动画。
 
