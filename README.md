@@ -1,6 +1,6 @@
 # UI Studio
 
-本地 UI 图片拆分与素材工作台。当前版本 **0.3.0-beta.22**，默认直连本机已登录的 Codex CLI。
+本地 UI 图片拆分与素材工作台。当前版本 **0.3.0-beta.23**，默认直连本机已登录的 Codex CLI。
 
 ## 启动
 
@@ -16,12 +16,13 @@ npm start
 
 ## 最简单的工作方式
 
-1. 上传原图，得到固定 UI ID。勾选素材去背景、透明 PNG、遮挡补绘三项要求，点击“交给 Codex 拆分”。
-2. 本地 Codex 接收整图、ID 和要求，在一个任务中自主判断组件范围，调用真实图像工具拆分、补绘并整理回传。程序不按视觉分数、透明比例或白边判定拦截结果，不再固定 24 项逐项质检重试。
-3. 回传结果自动新增版本，进入第二步“检查素材”。设计师查看是否满意，程序只显示 Alpha、尺寸和来源等事实，不把生成完成当作人工验收。
-4. 不满意的素材可复制 UI ID、EL 素材 ID 或 SPLIT 任务 ID，连同修改意见再次交给 Codex；素材详情和任务区提供“复制给 Codex”入口。修正时保留其他素材与历史，以新版本回传。
+1. 项目库点击 UI 图，直接打开左原图、右素材的工作台；底部缩略图直接切换 UI。上传新图同样进入工作台，每张图有固定 UI ID。
+2. 点击“拆分素材”打开弹窗，勾选去背景、透明 PNG、遮挡补绘三项要求后开始。
+3. 本地 Codex 接收整图、ID 和要求，在一个任务中自主判断组件范围，调用真实图像工具拆分、补绘并整理回传。程序不按视觉分数、透明比例或白边判定拦截结果，不再固定 24 项逐项质检重试。
+4. 回传结果自动新增版本，回到素材工作台。设计师查看是否满意，程序只显示 Alpha、尺寸和来源等事实，不把生成完成当作人工验收。
+5. 不满意的素材可复制 UI ID、EL 素材 ID 或 SPLIT 任务 ID，连同修改意见再次交给 Codex；素材详情和任务区提供“复制给 Codex”入口。修正时保留其他素材与历史，以新版本回传。
 
-之后可复刻 HTML5/CSS、验收网页，或直接本地交付 PNG。所有步骤共用 /ui/UI-ID?stage=… 路径。原 stage=prepare 与 /review/ 链接仍兼容。
+点击素材仍打开原有详情，可继续细分、复刻 HTML5/CSS 或下载。版本历史保留在素材面板，“项目信息与高级联动”提供本地保存和打开目录。移除四步导航及底部上一步/下一步；旧步骤链接兼容进入 /ui/UI-ID?stage=components 工作台。
 
 原图中被遮挡的部分属于生成推断，不能声称原 PSD 无损分层。真实拆分效果最终由设计师判断；本次流程验证使用隔离模型替身，不作为真实图像质量验收。
 
@@ -85,8 +86,8 @@ bridge/mcp.mjs 提供 get_ui、get_ui_group、get_ui_history、pull_ui、publish
 本地 /updates/ 随工具提供版本说明及下载。
 
 - 源码：https://github.com/spacesu851/ui-studio
-- 发布：https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.22
-- 工具包：https://github.com/spacesu851/ui-studio/releases/download/v0.3.0-beta.22/ui-studio-v0.3.0-beta.22.zip
+- 发布：https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.23
+- 工具包：https://github.com/spacesu851/ui-studio/releases/download/v0.3.0-beta.23/ui-studio-v0.3.0-beta.23.zip
 
 分发给别人后，对方使用自己的本机 Codex 登录；OpenAI API 仍作为显式可选兼容引擎，密钥只放本机服务内存或环境变量。字体、Logo 与 favicon 本地打包；保留 OverlayScrollbars 和按需加载的 GSAP 微交互，减少动态效果时停用动画。
 

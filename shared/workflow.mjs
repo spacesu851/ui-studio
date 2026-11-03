@@ -1,5 +1,5 @@
 export const WORKFLOW=[
- {id:'split',title:'拆分素材',description:'确认原图与三项要求，交给 Codex 自主拆分，结果回到第二步。'},
+ {id:'split',title:'拆分素材',description:'确认原图，开始拆分。完成后由你检查素材。'},
  {id:'components',title:'检查素材',description:'由设计师查看拆分结果；不满意的素材按 ID 交给 Codex 修正，也可复刻网页组件。'},
  {id:'review',title:'验收效果',description:'对照原图，检查文字、外观与实际交互。'},
  {id:'delivery',title:'本地交付',description:'保存独立文件夹，交付 PNG、HTML、CSS 与任务清单。'}
