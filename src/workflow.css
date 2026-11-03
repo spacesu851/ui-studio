@@ -43,3 +43,5 @@
 .studio-shell .filmstrip{height:92px}.studio-shell .filmstrip [data-overlayscrollbars-viewport]{padding:0}.studio-shell .filmstrip .scroll-content.horizontal{padding:12px 18px 14px;gap:10px;min-height:90px}@media(max-width:760px){.studio-shell .filmstrip .scroll-content.horizontal{padding-left:14px;padding-right:14px}}
 
 .library-workspace .crumb .crumb-new-group{min-height:28px;padding:5px 9px;font-size:11px;border-radius:8px}.library-workspace .overview-heading{margin-top:22px}@media(max-width:600px){.library-workspace .crumb{flex-wrap:wrap}.library-workspace .crumb-end{flex-basis:100%;margin-top:4px}}
+
+.library-workspace .crumb .library-search{margin-left:auto;flex:0 1 228px}.footer-right{display:flex;align-items:center;justify-content:flex-end;gap:18px}.footer-right .storage-note{font-size:10px;color:var(--muted)}@media(max-width:600px){.library-workspace .crumb .library-search{flex:1 1 100%;margin-top:6px}.header .header-end .button{padding:8px 10px;gap:5px;font-size:11px}.footer-right{flex-wrap:wrap;gap:8px 14px}.footer-right .storage-note{font-size:9px}}
