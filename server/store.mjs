@@ -43,15 +43,11 @@ export class Store {
       // Imported transparent assets have no crop recipe. Carry their bytes forward.
       const png=old?.kind==='imported'&&!input.image?await readFile(this.file(old.url)):await extract(decoded.png,e.rect,e.removeBackground,e.tolerance);
       const details=materialDetails(e,old),alpha=await alphaInfo(png);
-      if(details.role==='component'&&processing.transparentComponents&&!alpha.hasTransparency)throw new Error(`素材“${e.name}”没有实际透明像素，请先去背景；完整底图应标记为背景层。`);
-      if(details.role==='component'&&!alpha.hasVisiblePixels)throw new Error(`素材“${e.name}”完全透明，请调整选区或去背景容差。`);
       await writeFile(path.join(directory,`${e.id}.png`),png);elements.push({...e,...details,alpha,...(old?.kind==='imported'&&!input.image?{kind:'imported',pixelWidth:old.pixelWidth,pixelHeight:old.pixelHeight}:{kind:'crop'}),url:`${base}/${e.id}.png`});
     }
     for(const m of imported){const asset=await decodeImage(m.image),eid=m.id||elementId();if(!/^EL-[a-f0-9]{8}$/.test(eid)||elements.some(e=>e.id===eid))throw new Error('导入素材 ID 不合法或重复');
       const rect=m.rect||{x:0,y:0,width:Math.min(asset.width,decoded.width),height:Math.min(asset.height,decoded.height)};validateElements([{id:eid,rect}],decoded.width,decoded.height);
       const details=materialDetails(m),alpha=await alphaInfo(asset.png);
-      if(details.role==='component'&&processing.transparentComponents&&!alpha.hasTransparency)throw new Error(`素材“${m.name||eid}”没有实际透明像素。请先去背景；完整底图需明确标记 role=background。`);
-      if(details.role==='component'&&!alpha.hasVisiblePixels)throw new Error(`素材“${m.name||eid}”完全透明，没有可见内容`);
       await writeFile(path.join(directory,`${eid}.png`),asset.png);elements.push({id:eid,name:String(m.name||'导入素材').slice(0,100),rect,kind:'imported',...details,alpha,removeBackground:false,tolerance:30,pixelWidth:asset.width,pixelHeight:asset.height,url:`${base}/${eid}.png`});}
     const manifest={schema:'imageos.ui/v1',id,taskId:task.id,title:ui.title,folder:ui.folder_id,version:number,created:new Date().toISOString(),note:String(input.note||'更新素材').slice(0,1000),source:String(input.source||'本地 Codex').slice(0,50),processing,processingReport:report,width:decoded.width,height:decoded.height,original:`${base}/original.png`,elements};
     this.db.exec('BEGIN IMMEDIATE');try{if(this.ui(id).latest!==input.expectedVersion)throw Object.assign(new Error('提交冲突，请先同步最新版本'),{status:409});

@@ -58,8 +58,4 @@ export class OpenAiProvider {
     form.append('image[]',new Blob([crop],{type:'image/png'}),'target.png');form.append('image[]',new Blob([original],{type:'image/png'}),'context.png');
     const data=await this.request('/images/edits',{body:form,signal});const b64=data.data?.[0]?.b64_json;if(typeof b64!=='string'||b64.length>38_000_000)throw fail('图像服务没有返回可用 PNG 数据；需要支持 b64_json 的 Images Edits 接口。',502);return Buffer.from(b64,'base64');
   }
-  async review({crop,output,asset,signal}){
-    const images=await Promise.all([crop,output].map(png=>sharp(png).resize({width:1000,height:1000,fit:'inside',withoutEnlargement:true}).png().toBuffer()));
-    return this.vision(`第一张为原图参考区域，第二张为生成素材。目标是“${asset.name}”：${asset.description}。严格检查主体是否对应、颜色造型和必要文字是否保留、主体有无残缺、是否夹带其他组件、是否把裁切白底或棋盘格画进了素材。${asset.role==='background'?'这是独立背景：检查原前景文字、按钮、奖品是否移除，遮挡区域是否自然补齐。':'这是透明组件：只能保留目标主体和本身的必要文字，不能保留场景矩形背景。'}${asset.refinement?'这是二次细分后的单独一层：必须排除兄弟组件，不能再次返回完整父素材。边框中央应透明而非残留头像；底板不能残留文字；文字层不能带底板。精细发丝、发光边缘不应被截断。':''}返回 passed、0到1的 similarity 和具体 issues。相似度不足 0.75 或任何明显问题必须不通过。无法确定时不通过。`,images,REVIEW_SCHEMA,'ui_asset_review',signal);
-  }
 }

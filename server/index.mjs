@@ -68,10 +68,11 @@ export async function createApp({dataDir=process.env.UI_STUDIO_DATA||path.join(r
   app.post('/api/ai/test',async(req,res)=>res.json(await providerFactory(aiSettings.snapshot()).test()));
   app.get('/api/ui/:id/ai',(req,res)=>res.json(aiJobs.latest(req.params.id)));
   app.post('/api/ui/:id/ai',async(req,res)=>res.status(202).json(aiJobs.start(req.params.id,req.body)));
-  app.get('/api/ai/jobs/:job',(req,res)=>res.json(aiJobs.get(req.params.job)));
+  app.get('/api/ai/jobs/:job',(req,res)=>{const job=aiJobs.get(req.params.job),runtime=codex?.status();if(runtime?.task?.context?.taskId===job.id)job.activity={message:runtime.task.message,started:runtime.task.started};res.json(job)});
   app.get('/api/ai/jobs/:job/assets/:index',async(req,res)=>{res.setHeader('Cache-Control','no-store');res.type('png').send(await aiJobs.asset(req.params.job,req.params.index));});
   app.post('/api/ai/jobs/:job/cancel',(req,res)=>res.json(aiJobs.cancel(req.params.job)));
   app.post('/api/ai/jobs/:job/approve',(req,res)=>res.status(202).json(aiJobs.approve(req.params.job,req.body)));
+  app.post('/api/ai/jobs/:job/deliver',async(req,res)=>res.status(201).json(await aiJobs.deliver(req.params.job,req.body)));
   app.post('/api/ai/jobs/:job/resume',(req,res)=>res.status(202).json(aiJobs.resume(req.params.job)));
   app.get('/api/connection',(req,res)=>res.json({projectPath:root,cliPath:path.join(root,'bridge','cli.mjs'),mcpPath:path.join(root,'bridge','mcp.mjs'),nodePath:process.execPath,exportRoot:local.root,codex:codex?.status()}));
   app.get('/api/ui/:id/reviews',(req,res)=>res.json(reviews.report(req.params.id,req.query.version)));

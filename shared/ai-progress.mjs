@@ -1,0 +1,2 @@
+export function splitProgress(job){const assets=job?.assets||[];return {blocked:assets.find(a=>a.status==='failed'),stopped:['failed','awaiting-designer'].includes(job?.status),generated:assets.filter(a=>a.file||a.previewAvailable).length,pending:assets.filter(a=>!a.file&&!a.previewAvailable).length};}
+export function elapsedLabel(start,now){const value=new Date(start).getTime();if(!Number.isFinite(value))return '';const seconds=Math.max(0,Math.floor((now-value)/1000));return `${Math.floor(seconds/60)}分${String(seconds%60).padStart(2,'0')}秒`;}

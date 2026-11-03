@@ -18,3 +18,5 @@ export const ReviewStage=deferred(()=>import('./ReviewPage.jsx'),'ReviewStage');
 export const UpdatesPage=deferred(()=>import('./UpdatesPage.jsx'),'UpdatesPage');
 
 export const AssetDetailsDialog=deferred(()=>import('./AssetDetailsDialog.jsx'),'AssetDetailsDialog',{dialog:true});
+
+export const GeneratedCandidatesDialog=deferred(()=>import('./GeneratedCandidatesDialog.jsx'),'GeneratedCandidatesDialog',{dialog:true});

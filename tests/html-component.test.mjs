@@ -37,7 +37,7 @@ async function fixture({strategy='hybrid',iconType='svg',reviewPassed=true}={}){
 }
 test('simple frame uses CSS without image edits; fidelity policy and user render override are sent to planning',async()=>{
  const f=await fixture({strategy:'css'});try{const target=f.ui.elements[0],r=await generate(f,target);assert.equal(r.status,200);assert.equal(r.data.recipe.mode,'css');assert.equal(f.calls.filter(c=>c.type==='edit').length,0);assert.match(f.calls[0].prompt,/花园守护/);assert.match(f.calls[0].prompt,/完整去字底板/);assert.equal(r.data.recipe.icons[0].type,'svg');
- const forced=await analyzeComponent(f.provider,f.app.locals.store,original,target,{strategy:'hybrid',kind:'panel'});assert.equal(forced.kind,'panel');assert.equal(forced.mode,'hybrid');assert.equal(f.calls.filter(c=>c.type==='edit').length,1);assert.match(f.calls.at(-2).prompt,/Remove ALL text/);
+ const forced=await analyzeComponent(f.provider,f.app.locals.store,original,target,{strategy:'hybrid',kind:'panel'});assert.equal(forced.kind,'panel');assert.equal(forced.mode,'hybrid');assert.equal(f.calls.filter(c=>c.type==='edit').length,1);assert.match(f.calls.find(c=>c.type==='edit').prompt,/Remove ALL text/);
  }finally{await f.close()}
 });
 test('glowing plate uses a verified clean background, separate SVG heart and editable digits; version/local export preserve every layer',async()=>{
@@ -54,7 +54,7 @@ test('complex small icons are generated as checked transparent PNG and embedded 
  }finally{await f.close()}
 });
 test('unverified text-removal, invalid geometry and stale source are rejected rather than using a baked-text image',async()=>{
- const f=await fixture({reviewPassed:false});try{const target=f.ui.elements[0];assert.equal((await f.call(`/ui/${f.ui.id}/html-component/analyze`,{expectedVersion:1,targetId:target.id})).status,409);const r=await generate(f,target);assert.equal(r.status,400);assert.match(r.data.error,/去字底图检查未通过/);assert.equal(f.app.locals.store.version(f.ui.id).version,2);assert.equal(f.opened.length,0);assert.throws(()=>validateHtmlComponent({...base,mode:'hybrid'}),/去除原文字/);assert.throws(()=>validateHtmlComponent({...base,icons:[{type:'image',name:'x',x:90,y:0,width:20,height:10,imageId:'0'.repeat(64)}]}),/位置/);
+ const f=await fixture({reviewPassed:false});try{const target=f.ui.elements[0];assert.equal((await f.call(`/ui/${f.ui.id}/html-component/analyze`,{expectedVersion:1,targetId:target.id})).status,409);const r=await generate(f,target);assert.equal(r.status,200,r.data.error);assert.match(r.data.recipe.style.notes,/程序未自动判定好坏/);assert.equal(f.calls.filter(c=>c.name==='ui_textfree_background_review').length,0);assert.equal(f.app.locals.store.version(f.ui.id).version,2);assert.equal(f.opened.length,0);assert.throws(()=>validateHtmlComponent({...base,mode:'hybrid'}),/去除原文字/);assert.throws(()=>validateHtmlComponent({...base,icons:[{type:'image',name:'x',x:90,y:0,width:20,height:10,imageId:'0'.repeat(64)}]}),/位置/);
  }finally{await f.close()}
 });
 
