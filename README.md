@@ -1,6 +1,6 @@
 # UI Studio
 
-本地 UI 图片拆分与素材工作台。当前版本 **0.3.0-beta.25**，默认直连本机已登录的 Codex CLI。
+本地 UI 图片拆分与素材工作台。当前版本 **0.3.0-beta.26**，默认直连本机已登录的 Codex CLI。
 
 ## 启动
 
@@ -86,8 +86,8 @@ bridge/mcp.mjs 提供 get_ui、get_ui_group、get_ui_history、pull_ui、publish
 本地 /updates/ 随工具提供版本说明及下载。
 
 - 源码：https://github.com/spacesu851/ui-studio
-- 发布：https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.25
-- 工具包：https://github.com/spacesu851/ui-studio/releases/download/v0.3.0-beta.25/ui-studio-v0.3.0-beta.25.zip
+- 发布：https://github.com/spacesu851/ui-studio/releases/tag/v0.3.0-beta.26
+- 工具包：https://github.com/spacesu851/ui-studio/releases/download/v0.3.0-beta.26/ui-studio-v0.3.0-beta.26.zip
 
 分发给别人后，对方使用自己的本机 Codex 登录；OpenAI API 仍作为显式可选兼容引擎，密钥只放本机服务内存或环境变量。字体、Logo 与 favicon 本地打包；保留 OverlayScrollbars 和按需加载的 GSAP 微交互，减少动态效果时停用动画。
 
